@@ -128,7 +128,7 @@
         </h1>
       </div>
       <div class="NavItem">
-        <a href="labdetails.php">HOME</a>
+        <a href="landing_page.php">HOME</a>
         <a href="#">CONTACT</a>
         <a href="#">ABOUT</a>
         <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i>
