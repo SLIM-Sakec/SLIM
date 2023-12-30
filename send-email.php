@@ -13,7 +13,7 @@ use PHPMailer\PHPMailer\SMTP;
 $mail = new PHPMailer(true);
 
 // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-
+$currentDateTimeNumeric = date("YmdHis");
 $mail->isSMTP();
 $mail->SMTPAuth = true;
 
@@ -29,7 +29,7 @@ $mail->addReplyTo($email,$name);
 $mail->addAddress("mastersumeetov@gmail.com");//helpdesk email//
 
 $mail->Subject = $subject;
-$mail->Body = $email."\n".$message;
+$mail->Body = $email."\n".$message."\n".$currentDateTimeNumeric;
 
 $mail->send();
 
