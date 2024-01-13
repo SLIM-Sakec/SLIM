@@ -60,7 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $remarks = $_POST['remarks'];
         $date = date('Y-m-d H:i:s');
         $sql= "UPDATE `repair_log` SET `labno`='$labno',`device_no`='$pcno',`kharab_date`='$ed',`repair_date`='$date',`issue`='$issue',`remarks`='$remarks' WHERE `device_no` ='$pcno'";
+        $sql1="UPDATE `devices` SET `isworking`='1' WHERE `pcno`='$pcno' ";
         $result = mysqli_query($conn, $sql);
+        $result1 = mysqli_query($conn, $sql1);
       }
     }
   }
