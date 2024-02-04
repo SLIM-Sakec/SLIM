@@ -393,7 +393,7 @@
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form class="modal-content" action="labdetails.php" method="post">
+          <form  id="report" class="modal-content" onsubmit="submitForm(event)" method="post">
             <div class="container">
    
               <p>Please fill in this form to report a system.</p>
@@ -688,6 +688,7 @@
 
 
       console.log(type);
+      
 
       $.ajax({
         url: window.location.href,
@@ -709,6 +710,29 @@
         }
       });
     });
+
+
+    async function submitForm(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var form = document.getElementById('report');
+        var formData = new FormData(form);
+
+        // Send data to the first action page
+        await fetch('labdetails.php', {
+            method: 'POST',
+            body: formData,
+        });
+
+        // Send data to the second action page
+        await fetch('send-email.php', {
+            method: 'POST',
+            body: formData,
+        });
+
+        // You can do something after both submissions if needed
+        console.log('Form data submitted to both pages successfully.');
+    }
   </script>
 
 </body>
