@@ -84,9 +84,8 @@ display: flex;
 }
 .SideNav{
 box-sizing: border-box;
-width: 20vw;
+width: 19vw;
 height: 70vh;
-
 background: #FFF9F9;
 border: 1px solid rgba(0, 0, 0, 0.1);
 border-radius: 2px;
@@ -121,8 +120,10 @@ background: rgb(57 137 255 / 58%);
 }
 
 .footer{
+display:flex;
+justify-content:space-between;
 height: 50px;
-margin-top:10px;
+padding:20px;
 background-color: #f5f5f5;
 overflow: hidden;
 }
@@ -207,4 +208,8 @@ background: rgb(57 137 255 / 58%);
 input{
     margin:5px;
     padding:5px;
+}
+
+.options{
+    margin-right:20px;
 }

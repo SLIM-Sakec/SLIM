@@ -547,7 +547,14 @@
 
 
   <div class="footer">
-    LAB ASISTANT : 
+    <div>
+    LAB INCHARGE : 
+    &emsp;&emsp;&emsp;&emsp;
+    LAB ASSISTANT :
+    </div>
+    <div>
+      Made with &#10083;
+    </div>
 
   </div>
 
