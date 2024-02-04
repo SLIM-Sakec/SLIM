@@ -1,5 +1,11 @@
 <?php
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $pcno = $_POST['pcno'];
+    $issue = $_POST['issue'];
+}
+
 $name = $_POST["name"];
 $email = $_POST["email"];
 $subject = $_POST["subject"];
@@ -28,8 +34,8 @@ $mail->setFrom($email,$name);
 $mail->addReplyTo($email,$name);
 $mail->addAddress("mastersumeetov@gmail.com");//helpdesk email//
 
-$mail->Subject = $subject;
-$mail->Body = $email."\n".$message."\n".$currentDateTimeNumeric;
+$mail->Subject = $pcno;
+$mail->Body = $email."\n".$issue."\n".$currentDateTimeNumeric;
 
 $mail->send();
 
