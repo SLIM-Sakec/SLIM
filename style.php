@@ -210,6 +210,11 @@ input{
     padding:5px;
 }
 
+.td{
+    padding:30px;
+}
+
+
 .options{
     margin-right:20px;
 }

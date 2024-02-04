@@ -1,9 +1,15 @@
 <?php
 
-$name = $_POST["name"];
-$email = $_POST["email"];
-$subject = $_POST["subject"];
-$message = $_POST["message"];
+ if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve form data
+    $pcno = $_POST['pcno'];
+    $issue = $_POST['issue'];
+ }
+
+// $name = $_POST["name"];
+ $email = "aryan@gmail.com";
+// $subject = $_POST["subject"];
+// $message = $_POST["message"];
 
 require "vendor/autoload.php";
 
@@ -13,7 +19,7 @@ use PHPMailer\PHPMailer\SMTP;
 $mail = new PHPMailer(true);
 
 // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-
+$currentDateTimeNumeric = date("YmdHis");
 $mail->isSMTP();
 $mail->SMTPAuth = true;
 
@@ -24,12 +30,12 @@ $mail->Port = 587;
 $mail->Username = "mastersumeetov@gmail.com";//helpdesk email//
 $mail->Password = "lzzs tbzk bwlf ufyz";
 
-$mail->setFrom($email,$name);
-$mail->addReplyTo($email,$name);
+$mail->setFrom($email,$pcno);
+//$mail->addReplyTo($email,$name);
 $mail->addAddress("mastersumeetov@gmail.com");//helpdesk email//
 
-$mail->Subject = $subject;
-$mail->Body = $email."\n".$message;
+$mail->Subject = $pcno;
+$mail->Body = $issue."\n".$currentDateTimeNumeric;
 
 $mail->send();
 
