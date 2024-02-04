@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>change roles</title>
+    <link rel="stylesheet" type= "text/css" media="screen" href="style.php">
+    <style>
+      form{
+          display: flex;
+          justify-content: center;
+          font-family: Arial, Helvetica, sans-serif;
+          padding: 10px;
+      }
+  </style>
+</head>
+<body>
+  
+  <form action="/change_role.php" method="POST">
+    <div>
+      <div>Lab Incharge Roles</div>
+      <div style="padding: 10px; margin-bottom: 10px;"><label for="labInchargeID">Current Lab Incharge</label>
+    <input type="text" class="input" name="labincharge">
+  </div>
+  <div style="padding: 10px; margin-bottom: 10px;"><label for="labInchargeID">Current Lab Assitant</label>
+    <input type="text" class="input" name="labassist">
+  </div>
+  
+  <input class="EditBtn" style="background-color:#DFFFCB; border: 1px solid black; padding:5px 20px 5px 20px; width: 145px; margin-left: 25px; margin-right: 25px;" type="submit" value="Submit">
+  </div>
+</form>
+</body>
+</html>

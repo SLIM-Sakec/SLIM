@@ -393,7 +393,7 @@
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form  id="report" class="modal-content" onsubmit="submitForm(event)" method="post">
+          <form  id="report" class="modal-content" onsubmit="submitForm2(event)" method="post">
             <div class="container">
    
               <p>Please fill in this form to report a system.</p>
@@ -712,7 +712,7 @@
     });
 
 
-    async function submitForm(event) {
+    async function submitForm2(event) {
         event.preventDefault(); // Prevent the default form submission
 
         var form = document.getElementById('report');

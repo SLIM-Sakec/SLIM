@@ -12,34 +12,39 @@ include("repairData.php");
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://kit.fontawesome.com/d82cbb91b9.js" crossorigin="anonymous"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <link rel="stylesheet" type= "text/css" media="screen" href="style.php">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" type= "text/css" media="screen" href="style.php">
   <title>Repair Log</title>
   
   <style>
-table {
-  font-family: Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+  table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    margin-top: 40px;
+    width: 100%;
+  }
 
-table td, table th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
+  table td, table th {
+    border: 1px solid #ddd;
+    padding: 30px;
+    width: 30px;
+    
+    text-align: center;
+  }
 
-table tr:nth-child(even){background-color: #f2f2f2;}
+  table tr:nth-child(even){background-color: #f2f2f2;}
 
-table tr:hover {background-color: #ddd;}
+  table tr:hover {background-color: #ddd;}
 
-table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #333;
-  color: white;
-}
+  table th {
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    text-align: center;
+    background-color: #333;
+    color: white;
+  }
 </style>
 </head>
 <body>
@@ -85,18 +90,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="container">
  <div class="row">
-   <div class="col-sm-8">
+   
     <?php echo $deleteMsg??''; ?>
     <div class="table-responsive">
-      <table class="table table-bordered">
-       <thead><tr><th>Lab number</th>
-         <th>Pc Number</th>
-         <th>Date of Issue</th>
-         <th>Status</th>
-         <th>Issue</th>
-         <th>Date of repair</th>
-         <th></th>
-    </thead>
+      <table class="table table-bordered table-striped">
+       <thead>
+        <tr>
+          <th>Lab number</th>
+          <th>Pc Number</th>
+          <th>Date of Issue</th>
+          <th>Status</th>
+          <th>Issue</th>
+          <th>Date of repair</th>
+        </tr>
+        </thead>
     <tbody>
   <?php
       if(is_array($fetchData)){      
@@ -123,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       <td>
        <div>   
-       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop<?php echo $data['device_no']; ?>">Repair</button></td>
+       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:5px 20px 5px 20px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop<?php echo $data['device_no']; ?>">Repair</button></td>
       </div>
   
     

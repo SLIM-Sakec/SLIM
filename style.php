@@ -208,3 +208,7 @@ input{
     margin:5px;
     padding:5px;
 }
+
+.td{
+    padding:30px;
+}
