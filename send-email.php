@@ -6,8 +6,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $issue = $_POST['issue'];
 }
 
-$name = $_POST["name"];
-$email = $_POST["email"];
+$name = "bhadvavivek";
+$email = "tanish.nandu16610@sakec.ac.in";
 $subject = $_POST["subject"];
 $message = $_POST["message"];
 
