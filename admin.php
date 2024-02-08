@@ -24,11 +24,33 @@
       align-items: center;
       font-family: Arial, Helvetica, sans-serif;
       background-color: #f5f5f5;
-      height: 450px;
+      height: 480px;
       width: 30vw;
       border-radius: 10px;
-      
     }
+    .deleteLabModal{
+      border: 1px solid #abb4c6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f5f5f5;
+      height: 480px;
+      width: 30vw;
+      border-radius: 10px;
+    }
+    .changeRoleModal{
+      border: 1px solid #abb4c6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f5f5f5;
+      height: 480px;
+      width: 30vw;
+      border-radius: 10px;
+    }
+    
   </style>
 </head>
 
@@ -206,15 +228,30 @@
             <?php
 
           } elseif ($type == 2) {
-            echo " <div>
-            delete lab here
-            </div>
-            ";
-          } elseif ($type == 3) {
-            echo " <div>
-            change roles here
-            </div>
-            ";
+            ?>
+            <form class="deleteLabModal">
+        <div>
+        <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Delete LAB</b></h1><br>
+        <div style="display:flex; justify-content: center;"><input type="text" class="input" style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;" placeholder="Enter Lab Number" name="labno" required></div>
+        <div style="display:flex; justify-content: center;"><input type="text" class="input" style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;" placeholder="Enter Branch Name" name="branch" required></div>
+        <div style="display:flex; justify-content: center;"><button type="submit" class="afbutton" style="background-color:#DFFFCB;border-radius:5px; border: 1px solid black; padding: 15px 100px 15px 100px; margin: 5px; ">Submit</button></div>
+        </div>
+    </form>
+    <?php
+          } elseif ($type == 3) {?>
+            <form class="changeRoleModal">
+      <div>
+      <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Lab Incharge Roles</b></h1><br>
+      <div style="display:flex; justify-content: center;">
+        <label style="border: #ffffff; padding: 20px 20px 20px 10px; margin-bottom: 20px;">Change Lab Incharge</label>
+        <input type="text" class="input" style="border: #ffffff; padding: 20px 50px 20px 50px; margin-bottom: 20px;" placeholder="Enter Lab Incharge" name="labno" required></div>
+      <div style="display:flex; justify-content: center;">
+        <label style="border: #ffffff; padding: 20px 19px 20px 10px; margin-bottom: 20px;" >Change Lab Assistant</label>
+        <input type="text" class="input" style="border: #ffffff; padding: 20px 50px 20px 50px; margin-bottom: 20px;" placeholder="Enter Lab Assistant" name="labname" required></div>
+      <div style="display:flex; justify-content: center; "><button type="submit" class="afbutton" style="background-color:#DFFFCB;border-radius:5px; border: 1px solid black; padding: 20px 100px 20px 100px;  width:272px ">Submit</button></div>
+    </div>
+  
+  </form><?php
           }
         } 
         ?>

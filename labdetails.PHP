@@ -131,7 +131,7 @@
         <a href="landing_page.php">HOME</a>
         <a href="#">CONTACT</a>
         <a href="#">ABOUT</a>
-        <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i>
+        <a href="login_page.php"> <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i></a>   
       </div>
     </div>
   </nav>
@@ -180,12 +180,19 @@
                   $ttinfo1 = json_encode($ttinfo);               
                   $ttinfo2 = substr($ttinfo1,14);
                   setcookie("timetable", $ttinfo2, time() + 3600, "/");
+                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
+                  $labAssistant = getValue($sql);
+                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
+                  $labIncharge = getValue($sql);
+
+                                
               } else{
               $selectedOption = "Please select a lab";
               echo $selectedOption;
             }
             
             foreach ($all_pc_info as $pc_info) {
+              
               if($selectedOption==$pc_info['labno']){
 
             ?>
@@ -393,7 +400,7 @@
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form  id="report" class="modal-content" onsubmit="submitForm2(event)" method="post">
+          <form  id="report" class="modal-content" onsubmit="submitForm2(event)" method="post" action="labdetails.php">
             <div class="container">
    
               <p>Please fill in this form to report a system.</p>
@@ -545,19 +552,29 @@
         </div>
         </div>
 
-
-  <div class="footer">
-    <div>
-    LAB INCHARGE : 
-    &emsp;&emsp;&emsp;&emsp;
-    LAB ASSISTANT :
-    </div>
-    <div>
-      Made with &#10083;
-    </div>
-
-  </div>
-
+        
+            <div class="footer">
+              <div id="roleChanger">
+                  <div class="rolesViewer">
+                      <?php 
+                        if (isset($labAssistant) && isset($labIncharge)) {
+                      ?>
+                        LAB INCHARGE : <?php echo $labIncharge['fname'];?> &nbsp; <?php echo $labIncharge['lname'];  ?>
+                        &emsp;&emsp;&emsp;&emsp;
+                        LAB ASSISTANT : <?php echo $labAssistant['fname'];?> &nbsp; <?php echo $labAssistant['lname'];  ?>
+                    
+                      <?php
+                        }
+                        else{  
+                        }
+                      ?>
+                  </div>
+              </div>
+                  <div>
+                     Made with &#10083;
+                  </div>
+            </div>             
+          
 
   <script>
     function submitForm(event) {
@@ -647,11 +664,13 @@
             // Find the specific class within the response
             var $specificClass = $response.find('.Grid-container');
             var $specificClass2 = $response.find('.TT');
-            
+            var $specificClass3 = $response.find('.rolesViewer');
             console.log('Selected elements:', $specificClass);
             console.log('Selected elements:', $specificClass2);
+            console.log('Selected elements:', $specificClass3);
             $("#gridChanger").html($specificClass);
             $("#imageChanger").html($specificClass2);
+            $("#roleChanger").html($specificClass3);
           }
         });
 
