@@ -131,7 +131,15 @@
         <a href="landing_page.php">HOME</a>
         <a href="#">CONTACT</a>
         <a href="#">ABOUT</a>
-        <a href="login_page.php"> <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i></a>   
+        <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" > <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i></a>  
+        
+          <div class="collapse collapse-horizontal" id="collapseWidthExample" style="position:absolute; align-items: right;" >
+            <div class="card card-body" style="width: 300px; ">
+              This is some placeholder content for a horizontal collapse. It's hidden by default and shown when triggered.
+              <a href="login_page.php"><button>logout</button></a>
+            </div>
+          </div>
+        
       </div>
     </div>
   </nav>
@@ -608,6 +616,7 @@
 
     // Get references to the dropdown elements
     const countryDropdown = document.getElementById("DepartmentDropdown");
+    console.log(countryDropdown);  
     const cityDropdown = document.getElementById("LabDropdown");
 
     // Populate the country dropdown
