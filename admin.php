@@ -75,90 +75,25 @@
 
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['action'])) {
-      if ($_POST['action'] == "add") {
-        $pcno = $_POST['pcno'];
-        $mname = $_POST['mname'];
-        $msno = $_POST['msno'];
-        $ksno = $_POST['ksno'];
-        $muno = $_POST['muno'];
-        $mono = $_POST['mono'];
-        $ip = $_POST['ip'];
-        $submsk = $_POST['submsk'];
-        $pcname = $_POST['pcname'];
-        $processor = $_POST['processor'];
-        $cpuspeed = $_POST['cpuspeed'];
-        $memory = $_POST['memory'];
-        $harddisk = $_POST['harddisk'];
-        $dvd = $_POST['dvd'];
-        $display = $_POST['display'];
-        $sound = $_POST['sound'];
-        $monitor = $_POST['monitor'];
-        $keyboard = $_POST['keyboard'];
-        $mouse = $_POST['mouse'];
-        $softwares = $_POST['softwares'];
-        $dept = 'comps';
-        $labno = $_COOKIE["SelectedLab"];
-        $lancard = $_POST['lancard'];
-
-        $sql1 =
-          "INSERT INTO `devices`(`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
-          VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0')";
-        $result = mysqli_query($conn, $sql1);
-      } else if ($_POST['action'] == "report") {
-        $labno = $_COOKIE["SelectedLab"];
-        $pcno = $_POST['pcno'];
-        $issue = $_POST['issue'];
-
-        $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`) VALUES ('$labno','$pcno','$issue','')";
-        $sql2 = "UPDATE `devices` SET `isworking` = 0 WHERE `pcno`= '$pcno'";
-        $result = mysqli_query($conn, $sql1);
-        $result = mysqli_query($conn, $sql2);
-      } else if ($_POST['action'] == "delete") {
-        $labno = $_COOKIE["SelectedLab"];
-        $pcno = $_POST['pcno'];
-        $sql1 = "DELETE FROM `repair_log WHERE 'pcno'= $pcno";
-
+      if ($_POST['action'] == "changeRole") {
+        $labAssistantnew=$_POST['labassist'];
+        $labno = $_COOKIE['SelectedLab'];
+        $labInchargenew=$_POST['labinc'];
+         if(isset($_POST['labassist']))
+         {
+        $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`current_status`='1' WHERE `uid`=$labAssistantnew AND `labno`=$labno";
+        $result = mysqli_query($conn, $sql);
+        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`labno`=$labno,`current_status`='0' WHERE `uid`=$olduidla";
         $result = mysqli_query($conn, $sql1);
 
-      } else if ($_POST['action'] == "update") {
-        $pcno = $_POST['pcno'];
-        $mname = $_POST['mname'];
-        $msno = $_POST['msno'];
-        $ksno = $_POST['ksno'];
-        $muno = $_POST['muno'];
-        $mono = $_POST['mono'];
-        $ip = $_POST['ip'];
-        $submsk = $_POST['submsk'];
-        $pcname = $_POST['pcname'];
-        $processor = $_POST['processor'];
-        $cpuspeed = $_POST['cpuspeed'];
-        $memory = $_POST['memory'];
-        $harddisk = $_POST['harddisk'];
-        $dvd = $_POST['dvd'];
-        $display = $_POST['display'];
-        $sound = $_POST['sound'];
-        $monitor = $_POST['monitor'];
-        $keyboard = $_POST['keyboard'];
-        $mouse = $_POST['mouse'];
-        $softwares = $_POST['softwares'];
-        $dept = 'comps';
-        $labno = $_COOKIE["SelectedLab"];
-        $lancard = $_POST['lancard'];
-
-        $sql1 =
-          "UPDATE `devices` SET (`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
-          VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0') WHERE 'pcno'=$pcno";
+         }
+         if(isset($_POST['labinc']))
+         {
+        $sql="UPDATE `slim_users` SET `role`='Lab Incharge',`current_status`='1' WHERE `uid`=$labAssistantnew WHERE `uid`='$labInchargenew'";
+        $result = mysqli_query($conn, $sql); 
+        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`labno`=$labno,`current_status`='0' WHERE `uid`=$olduidlc";
         $result = mysqli_query($conn, $sql1);
-      }
-      elseif($_POST['action'] == "addLabModal"){
-        $labNo = $_POST['labno'];
-        $labname = $_POST['labname'];
-        $branch = $_POST['branch'];
-
-        $sql1 =
-          "INSERT INTO `devices`( `dept`, `labno`) 
-          VALUES ('$branch','$labNo')";
-        $result = mysqli_query($conn, $sql1);
+         }
       }
     }
   }
@@ -249,8 +184,9 @@
                 </form>
                 <?php
           } elseif ($type == 3) {?>
-                <form class="changeRoleModal">
+                <form class="changeRoleModal" action="admin.php" method="post">
                     <div>
+                    <input type="hidden" name="action" value="changeRole">
                         <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Lab Incharge Roles</b></h1>
                         <br>
                         <div class="deplab">
@@ -279,6 +215,10 @@
                                     $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
                                     $labIncharge = getValue($sql);
                                     //setcookie("labIncharge", $labIncharge, time() + 3600, "/");
+                                    $sql2 = "SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
+                                    $olduidlc= getValue($sql2);
+                                    $sql ="SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
+                                    $olduidla = getValue($sql);
                                     
 
                                 
