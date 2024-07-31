@@ -81,7 +81,7 @@
       else if ($_POST['action'] == "delete") {
         $labno = $_COOKIE["SelectedLab"];
         $pcno = $_POST['pcno'];
-        $sql1 = "DELETE FROM `repair_log WHERE 'pcno'= $pcno";
+        $sql1 = "DELETE FROM `devices` WHERE `pcno`='$pcno'";
 
         $result = mysqli_query($conn, $sql1);
 
@@ -201,7 +201,7 @@
             
             foreach ($all_pc_info as $pc_info) {
               
-              if($selectedOption==$pc_info['labno']){
+              if($selectedOption==$pc_info['labno'] && $pc_info['pcno']!='lablist'){
 
             ?>
             <div class="Grid-item">
@@ -595,7 +595,7 @@
       countries: [{
           name: "Comps",
           cities: [<?php 
-             $sql = "SELECT DISTINCT`labno` FROM `devices` ";
+             $sql = "SELECT DISTINCT`labno` FROM `devices` WHERE `pcno` = 'lablist' ";
              $labinfo= getAllValues($sql);
                  foreach($labinfo as $linfo){
                    

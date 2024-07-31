@@ -156,9 +156,15 @@
         $branch = $_POST['branch'];
 
         $sql1 =
-          "INSERT INTO `devices`( `dept`, `labno`) 
-          VALUES ('$branch','$labNo')";
+          "INSERT INTO `devices`( `dept`, `labno`, `pcno`) 
+          VALUES ('$branch','$labNo','lablist')";
         $result = mysqli_query($conn, $sql1);
+      }
+      else if($_POST['action'] == "deleteLabModal"){
+        $labNo = $_POST['labno'];
+        $branch = $_POST['branch'];
+        $sql4 ="DELETE FROM `devices` WHERE `labno` = '$labNo' AND `pcno` = 'lablist' ";
+        $result = mysqli_query($conn, $sql4);
       }
     }
   }
@@ -233,10 +239,13 @@
 
           } elseif ($type == 2) {
             ?>
-                <form class="deleteLabModal">
+                <form class="deleteLabModal" method="post">
                     <div>
+                        
                         <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Delete LAB</b></h1><br>
-                        <div style="display:flex; justify-content: center;"><input type="text" class="input"
+                        <div style="display:flex; justify-content: center;">
+                            <input type="hidden" name="action" value="deleteLabModal">    
+                            <input type="text" class="input"
                                 style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;"
                                 placeholder="Enter Lab Number" name="labno" required></div>
                         <div style="display:flex; justify-content: center;"><input type="text" class="input"

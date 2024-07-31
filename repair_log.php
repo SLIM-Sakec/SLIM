@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $ed = $_POST['ed'];
         $remarks = $_POST['remarks'];
         $date = date('Y-m-d H:i:s');
-        $sql= "UPDATE `repair_log` SET `labno`='$labno',`device_no`='$pcno',`kharab_date`='$ed',`repair_date`='$date',`issue`='$issue',`remarks`='$remarks' WHERE `device_no` ='$pcno'";
+        $sql= "UPDATE `repair_log` SET `labno`='$labno',`device_no`='$pcno',`kharab_date`='$ed',`repair_date`='$date',`issue`='$issue',`remarks`='$remarks' WHERE `device_no` ='$pcno' AND `kharab_date` = '$ed'";
         $sql1="UPDATE `devices` SET `isworking`='1' WHERE `pcno`='$pcno' ";
         $result = mysqli_query($conn, $sql);
         $result1 = mysqli_query($conn, $sql1);
@@ -129,13 +129,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <td><?php echo $data['repair_date']??''; ?></td>
 
       <td>
-       <div>   
-       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:5px 20px 5px 20px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop<?php echo $data['device_no']; ?>">Repair</button></td>
-      </div>
-  
-    
+        <?php if($data['repair_date']=='To Be Repaired')
+        {
+
+          echo <<<EOD
+          
+      <div>   
+       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:5px 20px 5px 20px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop{$data['device_no']}">Repair</button></td>
+      </div> 
+      EOD;
+        }
+        else {
+          echo $data['remarks'];
+        }
+     ?>
      </tr>
-     <div class="modal fade" id="staticBackdrop<?php echo $data['device_no']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel<?php echo $data['device_no']; ?>" aria-hidden="true">
+      <div class="modal fade" id="staticBackdrop<?php echo $data['device_no']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel<?php echo $data['device_no']; ?>" aria-hidden="true">
                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                  <div class="modal-content">
                    <div class="modal-header">
@@ -143,26 +152,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                    </div>
                    <div class="modal-body">
-                  <form action="repair_log.php" method="post">
-                   <input type="hidden" name="action" value="repair">
-                   <input type="hidden" name="labno" value="<?php echo $data['labno'] ?>">
-                   <input type="hidden" name="ed" value="<?php echo $data['kharab_date'] ?>">
-                   <input type="hidden" name="pcno" value="<?php echo $data['device_no'] ?>">
-                   <input type="hidden" name="issue" value="<?php echo $data['issue'] ?>">
+                    <form id="repair_form" action="repair_log.php" method="post">
+                    <input type="hidden" name="action" value="repair">
+                    <input type="hidden" name="labno" value="<?php echo $data['labno'] ?>">
+                    <input type="text" name="ed" placeholder="<?php echo $data['kharab_date'] ?>">
+                    <input type="hidden" name="pcno" value="<?php echo $data['device_no'] ?>">
+                    <input type="text" name="issue" placeholder="<?php echo $data['issue'] ?>">
+                    <input type="text" name="tp" placeholder="<?php echo $data['device_no'] . $data['kharab_date'] ?>">
                    
-                   <label for="remarks"><b>Remark</b></label>
-              <input type="text" placeholder="remarks" name="remarks" required><br>
+                    <label for="remarks"><b>Remark</b></label>
+                    <input type="text" placeholder="remarks" name="remarks" required><br>
 
            
-                   </div>
-                   <div class="modal-footer">
-                   <button type="submit" class="btn btn-primary">Submit</button>
-                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                   </div>
-      </form>
-                 </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                    </form>
+                  </div>
                </div>
-             </div>
+      </div>
      <?php
       $sn++;}}else{ ?>
       <tr>
@@ -178,5 +188,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </div>
 </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#repair_form').on('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            $.ajax({
+                url: 'repair_log.php',
+                type: 'POST',
+                data: $(this).serialize(), // Serialize form data
+                success: function(response) {
+                    // Optionally process the response here
+                    // Refresh the page after successful form submission
+                    window.location.reload();
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
