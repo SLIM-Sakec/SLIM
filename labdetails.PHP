@@ -72,11 +72,12 @@
         $labno = $_COOKIE["SelectedLab"];
         $pcno = $_POST['pcno'];
         $issue = $_POST['issue'];
-        
-        $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`) VALUES ('$labno','$pcno','$issue','')";
+        $currentDateTimeNumeric = date("YmdHis");
+        $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`,`ticketno`) VALUES ('$labno','$pcno','$issue','','$currentDateTimeNumeric')";
         $sql2 = "UPDATE `devices` SET `isworking` = 0 WHERE `pcno`= '$pcno'";
         $result = mysqli_query($conn, $sql1);
         $result = mysqli_query($conn, $sql2);
+        echo "<meta http-equiv='refresh' content='0'>";
       }
       else if ($_POST['action'] == "delete") {
         $labno = $_COOKIE["SelectedLab"];
@@ -309,13 +310,13 @@
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addDeivceLabel">system information</h1>
+          <h1 class="modal-title fs-5" id="addDeivceLabel">System Information</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
           <form class="modal-content" action="labdetails.php" method="post">
-            <div class="container">
+            <div class="container addContainer">
               <h1>ADD A NEW PC</h1>
               <p>Please fill in this form to add a new system.</p>
               <hr>
@@ -388,14 +389,14 @@
 
 
               <div class="clearfix">
-                <button type="submit" class="signup">sumbit</button>
+                <button type="submit" class="signup">Submit</button>
               </div>
             </div>
           </form>
         </div>
-            </div>
-            </div>
-            </div>
+      </div>
+    </div>
+  </div>
        
        <!-- ------------------------------------ -->
 
@@ -408,7 +409,7 @@
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form  id="report" class="modal-content" onsubmit="submitForm2(event)" method="post" action="labdetails.php">
+          <form  id="report" class="modal-content" onsubmit="submitForm2(event);this.reset();" method="post" action="labdetails.php">
             <div class="container">
    
               <p>Please fill in this form to report a system.</p>
@@ -748,8 +749,7 @@
 
 
     async function submitForm2(event) {
-        event.preventDefault(); // Prevent the default form submission
-
+        
         var form = document.getElementById('report');
         var formData = new FormData(form);
 
@@ -767,6 +767,7 @@
 
         // You can do something after both submissions if needed
         console.log('Form data submitted to both pages successfully.');
+        
     }
   </script>
 

@@ -2,7 +2,7 @@
 include("config.php");
 $db= $conn;
 $tableName="repair_log";
-$columns= ['labno', 'device_no','kharab_date','repair_date','issue', 'remarks'];
+$columns= ['labno', 'device_no','kharab_date','repair_date','issue', 'remarks','ticketno'];
 $fetchData = fetch_data($db, $tableName, $columns);
 function fetch_data($db, $tableName, $columns){
  if(empty($db)){

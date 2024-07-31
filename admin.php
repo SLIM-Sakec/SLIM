@@ -79,29 +79,31 @@
         $labAssistantnew=$_POST['labassist'];
         $labno = $_COOKIE['SelectedLab'];
         $labInchargenew=$_POST['labinc'];
+        $olduidla2=$_COOKIE['olduidla'];
+        $olduidlc2=$_COOKIE['olduidlc'];
          if(isset($_POST['labassist']))
          {
-        $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`current_status`='1' WHERE `uid`=$labAssistantnew AND `labno`=$labno";
+        $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`current_status`='1' WHERE `uid`=$labAssistantnew";
         $result = mysqli_query($conn, $sql);
-        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`labno`=$labno,`current_status`='0' WHERE `uid`=$olduidla";
+        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`current_status`='0' WHERE `uid`=$olduidla2";
         $result = mysqli_query($conn, $sql1);
 
          }
          if(isset($_POST['labinc']))
          {
-        $sql="UPDATE `slim_users` SET `role`='Lab Incharge',`current_status`='1' WHERE `uid`=$labAssistantnew WHERE `uid`='$labInchargenew'";
+        $sql="UPDATE `slim_users` SET `role`='Lab Incharge',`current_status`='1' WHERE `uid`='$labInchargenew'";
         $result = mysqli_query($conn, $sql); 
-        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`labno`=$labno,`current_status`='0' WHERE `uid`=$olduidlc";
+        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`current_status`='0' WHERE `uid`=$olduidlc2";
         $result = mysqli_query($conn, $sql1);
+        }
       }
-      elseif($_POST['action'] == "addLabModal"){
+      else if($_POST['action'] == "addLabModal"){
         $labNo = $_POST['labno'];
         $labname = $_POST['labname'];
         $branch = $_POST['branch'];
 
         $sql1 =
-          "INSERT INTO `devices`( `dept`, `labno`, `pcno`) 
-          VALUES ('$branch','$labNo','lablist')";
+          "INSERT INTO `devices`( `dept`, `labno`, `pcno`) VALUES ('$branch','$labNo','lablist')";
         $result = mysqli_query($conn, $sql1);
       }
       else if($_POST['action'] == "deleteLabModal"){
@@ -112,6 +114,7 @@
       }
     }
   }
+
   ?>
 
     <nav>
@@ -201,287 +204,17 @@
                     </div>
                 </form>
                 <?php
-          } elseif ($type == 3) {?>
-                <form class="changeRoleModal" action="admin.php" method="post">
-                    <div>
-                    <input type="hidden" name="action" value="changeRole">
-                        <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Lab Incharge Roles</b></h1>
-                        <br>
-                        <div class="deplab">
-                            <div class="Dep">
-                                Department : <select id="DepartmentDropdown">
-                                    <option value="">Select a Department</option>
-                                </select>
-                            </div>
-                            <div class="lab">
-                                Lab : <select id="LabDropdown">
-                                    <option value="">Select a Lab</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="roleChanger">
-                            <div class="rolesViewer">
-                                <?php
-                                if(isset($_POST['city'])){
-                                                        
-                                    $selectedOption = $_POST['city'];
-                                    setcookie("SelectedLab",$selectedOption,time()+3600,"/");
-                                      
-                                    $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
-                                    $labAssistant = getValue($sql);
-                                    //setcookie("labAssistant", $labAssistant, time() + 3600, "/");
-                                    $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
-                                    $labIncharge = getValue($sql);
-                                    //setcookie("labIncharge", $labIncharge, time() + 3600, "/");
-                                    $sql2 = "SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
-                                    $olduidlc= getValue($sql2);
-                                    $sql ="SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
-                                    $olduidla = getValue($sql);
-                                    
-
-                                
-                                } else{
-                               
-                                }
-                                ?>
-
-                            </div>
-                        </div>
-                                <br>
-                        <div style="display:flex; justify-content: center;">
-                            <label style="border: #ffffff; padding: 20px 20px 20px 10px; margin-bottom: 20px;">Change
-                                Lab Incharge</label>
-                            <input type="text" class="input"
-                                style="border: #ffffff; padding: 20px 50px 20px 50px; margin-bottom: 20px;"
-                                placeholder="Enter Lab Incharge Email" name="labinc" >
-                        </div>
-                        <div style="display:flex; justify-content: center;">
-                            <label style="border: #ffffff; padding: 20px 19px 20px 10px; margin-bottom: 20px;">Change
-                                Lab Assistant</label>
-                            <input type="text" class="input"
-                                style="border: #ffffff; padding: 20px 50px 20px 50px; margin-bottom: 20px;"
-                                placeholder="Enter Lab Assistant Email" name="labassist" >
-                        </div>
-                        <div style="display:flex; justify-content: center; "><button type="submit" class="afbutton"
-                                style="background-color:#DFFFCB;border-radius:5px; border: 1px solid black; padding: 20px 100px 20px 100px;  width:272px ">Submit</button>
-                        </div>
-                    </div>
-
-
-
-                </form><?php
+          } elseif ($type == 3) {
+               
           }
         } 
         ?>
-                <!-- <img src="upload/<?php echo $finalimage; ?>" class="TTImage" alt="<?php echo $finalimage; ?>"> -->
             </div>
 
         </div>
     </div>
 
-    <div class="modal fade" id="addDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="addDeivceLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addDeivceLabel">system information</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <span onclick="document.getElementById('id01').style.display='none'" class="close"
-                        title="Close Modal"></span>
-                    <form class="modal-content" action="labdetails.php" method="post">
-                        <div class="container">
-                            <h1>ADD A NEW PC</h1>
-                            <p>Please fill in this form to add a new system.</p>
-                            <hr>
-                            <input type="hidden" name="action" value="add">
-
-                            <label for="mouse"><b>mouse model</b></label>
-                            <input type="text" placeholder="enter mouse model" name="mouse" required><br>
-
-                            <label for="softwares"><b>softwares in the pc</b></label>
-                            <input type="text" placeholder="enter softwares in the machine" name="softwares"
-                                required><br>
-
-
-                            <div class="clearfix">
-                                <button type="submit" class="signup">sumbit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ------------------------------------ -->
-
-    <div class="modal fade" id="ReportDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="ReportDevice">Report Device</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <span onclick="document.getElementById('id01').style.display='none'" class="close"
-                        title="Close Modal"></span>
-                    <form class="modal-content" action="labdetails.php" method="post">
-                        <div class="container">
-
-                            <p>Please fill in this form to report a system.</p>
-                            <hr>
-                            <input type="hidden" name="action" value="report">
-                            <label for="pcno"><b>pc number</b></label>
-                            <input type="text" placeholder="eg - 701-15" name="pcno" required><br>
-
-                            <label for="issue"><b>Issue</b></label>
-                            <input type="text" placeholder="" name="issue" required><br>
-
-
-
-                            <div class="clearfix">
-                                <button type="submit" class="signup">submit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="deleteDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="deleteDevice">Delete Device</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <span onclick="document.getElementById('id01').style.display='none'" class="close"
-                        title="Close Modal"></span>
-                    <form class="modal-content" action="labdetails.php" method="post">
-                        <div class="container">
-
-                            <p>Please fill in this form to delete a system</p>
-                            <hr>
-                            <input type="hidden" name="action" value="delete">
-                            <label for="pcno"><b>pc number</b></label>
-                            <input type="text" placeholder="eg - 701-15" name="pcno" required><br>
-
-
-
-
-                            <div class="clearfix">
-                                <button type="submit" class="signup">submit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="updateDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="updateDeivceLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="updateDeivceLabel">system information</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <span onclick="document.getElementById('id01').style.display='none'" class="close"
-                        title="Close Modal"></span>
-                    <form class="modal-content" action="labdetails.php" method="post">
-                        <div class="container">
-                            <h1>Update</h1>
-                            <p></p>
-                            <hr>
-                            <input type="hidden" name="action" value="update">
-                            <label for="pcno"><b>pc number</b></label>
-                            <input type="text" placeholder="enter the pc number" name="pcno" required><br>
-
-                            <label for="mname"><b>machine name</b></label>
-                            <input type="text" placeholder="Enter machine name" name="mname" required><br>
-
-                            <label for="msno"><b>machine serial number</b></label>
-                            <input type="text" placeholder="enter machine serial number" name="msno" required><br>
-
-                            <label for="ksno"><b>keyboard serial number</b></label>
-                            <input type="text" placeholder="enter keyboard serial number" name="ksno" required><br>
-
-                            <label for="muno"><b>mouse serial number</b></label>
-                            <input type="text" placeholder="enter mouse serial number" name="muno" required><br>
-
-                            <label for="mono"><b>monitor serial number</b></label>
-                            <input type="text" placeholder="enter monitor serial number" name="mono" required><br>
-
-                            <label for="ip"><b>IP address</b></label>
-                            <input type="text" placeholder="enter machine ip adress" name="ip" required><br>
-
-                            <label for="submsk"><b>subnet mask number</b></label>
-                            <input type="text" placeholder="enter machine submsk" name="submsk" required><br>
-
-                            <label for="pcname"><b>PCname</b></label>
-                            <input type="text" placeholder="enter pc name" name="pcname" required><br>
-
-                            <label for="processor"><b>Processor</b></label>
-                            <input type="text" placeholder="enter machine processor" name="processor" required><br>
-
-                            <label for="CPUspeed1"><b>CPUspeed</b></label>
-                            <input type="text" placeholder="enter machine cpu speed" name="CPUspeed1" required><br>
-
-                            <label for="memory"><b>memory size RAM </b></label>
-                            <input type="text" placeholder="enter machine memory size" name="memory" required><br>
-
-                            <label for="harddisk"><b>HARD DISK SIZE</b></label>
-                            <input type="text" placeholder="enter hard disk SIZE" name="harddisk" required><br>
-
-                            <label for="cpuspeed"><b>CPU SPEED</b></label>
-                            <input type="text" placeholder="enter DVD ROM TYPE" name="cpuspeed" required><br>
-
-                            <label for="dvd"><b>DVD TYPE</b></label>
-                            <input type="text" placeholder="enter DVD ROM TYPE" name="dvd" required><br>
-
-                            <label for="display"><b>display specs</b></label>
-                            <input type="text" placeholder="enter display specs" name="display" required><br>
-
-                            <label for="sound"><b>sound specs</b></label>
-                            <input type="text" placeholder="enter sound specs" name="sound" required><br>
-
-                            <label for="lancard"><b>lancard type</b></label>
-                            <input type="text" placeholder="enter lan card type" name="lancard" required><br>
-
-                            <label for="monitor"><b>monitor model</b></label>
-                            <input type="text" placeholder="enter monitor model" name="monitor" required><br>
-
-                            <label for="keyboard"><b>keyboard model</b></label>
-                            <input type="text" placeholder="enter keyboard model" name="keyboard" required><br>
-
-                            <label for="mouse"><b>mouse model</b></label>
-                            <input type="text" placeholder="enter mouse model" name="mouse" required><br>
-
-                            <label for="softwares"><b>softwares in the pc</b></label>
-                            <input type="text" placeholder="enter softwares in the machine" name="softwares"
-                                required><br>
-
-
-                            <div class="clearfix">
-                                <button type="submit" class="signup">sumbit</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
 
     <div class="footer">
@@ -495,7 +228,12 @@
                                     $labAssistant = getValue($sql);
                                     $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
                                     $labIncharge = getValue($sql);
-                                    
+                                    $sql2 = "SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
+                                    $olduidlc= getValue($sql2);
+                                     setcookie("olduidlc",$olduidlc['uid'],time()+3600,"/");
+                                    $sql ="SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
+                                    $olduidla = getValue($sql);
+                                     setcookie("olduidla",$olduidla['uid'],time()+3600,"/");
 
                                 
                                 } else{
@@ -505,9 +243,9 @@
                 <?php 
                         if (isset($labAssistant) && isset($labIncharge)) {
                       ?>
-                <br>&nbsp;&nbsp;&nbsp;&nbsp;Current Lab Incharge : <b><?php echo $labIncharge['fname'];?></b> &nbsp; <b><?php echo $labIncharge['lname'];  ?></b>
+                <br>&nbsp;&nbsp;&nbsp;&nbsp;Current Lab Incharge : <b><?php echo $labIncharge['fname'];?></b> &nbsp; <b><?php echo $labIncharge['lname'];  ?></b>&nbsp; <b><?php echo $olduidlc['uid'];  ?></b>
                 <br>
-                &nbsp;&nbsp;&nbsp;&nbsp;Current Lab Assistant : <b><?php echo $labAssistant['fname'];?></b> &nbsp; <b><?php echo $labAssistant['lname'];  ?></b>
+                &nbsp;&nbsp;&nbsp;&nbsp;Current Lab Assistant : <b><?php echo $labAssistant['fname'];?></b> &nbsp; <b><?php echo $labAssistant['lname'];  ?></b>&nbsp; <b><?php echo $olduidla['uid'];  ?></b>
 
                 <?php
                         }

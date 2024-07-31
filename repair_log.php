@@ -14,7 +14,7 @@ include("repairData.php");
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-  <link rel="stylesheet" type= "text/css" media="screen" href="style.php">
+  <link rel="stylesheet" type="text/css" media="screen" href="style.php">
   <title>Repair Log</title>
   
   <style>
@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $sql1="UPDATE `devices` SET `isworking`='1' WHERE `pcno`='$pcno' ";
         $result = mysqli_query($conn, $sql);
         $result1 = mysqli_query($conn, $sql1);
+        echo "<meta http-equiv='refresh' content='0'>";
       }
     }
   }
@@ -96,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <table class="table table-bordered table-striped">
        <thead>
         <tr>
+          <th>Ticket No </th>
           <th>Lab number</th>
           <th>Pc Number</th>
           <th>Date of Issue</th>
@@ -111,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       foreach($fetchData as $data){
     ?>
       <tr>
+      <td><?php echo $data['ticketno']??''; ?></td>
       <td><?php echo $data['labno']??''; ?></td>
       <td><?php echo $data['device_no']??''; ?></td>
       <td><?php echo $data['kharab_date']??''; ?></td>
@@ -135,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           echo <<<EOD
           
       <div>   
-       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:5px 20px 5px 20px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop{$data['device_no']}">Repair</button></td>
+       <button type="button" class="Repair" style="background-color:#DFFFCB;border: 1px solid black;padding:5px 20px 5px 20px;" data-bs-toggle="modal" data-bs-target="#staticBackdrop{$data['ticketno']}">Repair</button></td>
       </div> 
       EOD;
         }
@@ -144,26 +147,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
      ?>
      </tr>
-      <div class="modal fade" id="staticBackdrop<?php echo $data['device_no']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel<?php echo $data['device_no']; ?>" aria-hidden="true">
+      <div class="modal fade" id="staticBackdrop<?php echo $data['ticketno']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel<?php echo $data['ticketno']; ?>" aria-hidden="true">
                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                  <div class="modal-content">
                    <div class="modal-header">
-                     <h1 class="modal-title fs-5" id="staticBackdropLabel<?php echo $data['device_no']; ?>">Repair Log</h1>
+                     <h1 class="modal-title fs-5" id="staticBackdropLabel<?php echo $data['ticketno']; ?>">Repair Log</h1>
                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                    </div>
                    <div class="modal-body">
                     <form id="repair_form" action="repair_log.php" method="post">
                     <input type="hidden" name="action" value="repair">
                     <input type="hidden" name="labno" value="<?php echo $data['labno'] ?>">
-                    <input type="text" name="ed" placeholder="<?php echo $data['kharab_date'] ?>">
+                    <input type="hidden" name="ed" value="<?php echo $data['kharab_date'] ?>">
                     <input type="hidden" name="pcno" value="<?php echo $data['device_no'] ?>">
-                    <input type="text" name="issue" placeholder="<?php echo $data['issue'] ?>">
-                    <input type="text" name="tp" placeholder="<?php echo $data['device_no'] . $data['kharab_date'] ?>">
-                   
+                    <input type="hidden" name="issue" value="<?php echo $data['issue'] ?>">
                     <label for="remarks"><b>Remark</b></label>
                     <input type="text" placeholder="remarks" name="remarks" required><br>
 
-           
                     </div>
                     <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Submit</button>
@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
      <?php
       $sn++;}}else{ ?>
       <tr>
-        <td colspan="8">
+        <td colspan="9">
     <?php echo $fetchData; ?>
   </td>
       </tr>
@@ -190,21 +190,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#repair_form').on('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-            $.ajax({
-                url: 'repair_log.php',
-                type: 'POST',
-                data: $(this).serialize(), // Serialize form data
-                success: function(response) {
-                    // Optionally process the response here
-                    // Refresh the page after successful form submission
-                    window.location.reload();
-                }
-            });
-        });
-    });
+    // $(document).ready(function() {
+    //     $('#repair_form').on('submit', function(e) {
+    //         e.preventDefault(); // Prevent the default form submission
+    //         $.ajax({
+    //             url: 'repair_log.php',
+    //             type: 'POST',
+    //             data: $(this).serialize(), // Serialize form data
+    //             success: function(response) {
+    //                 // Optionally process the response here
+    //                 // Refresh the page after successful form submission
+    //                 window.location.reload();
+    //             }
+    //         });
+    //     });
+    // });
+
+    
 </script>
 </body>
 </html>

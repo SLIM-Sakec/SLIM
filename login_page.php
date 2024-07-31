@@ -250,19 +250,41 @@
         </div>
         <div class="vl"></div>
         <div>
-            <form>
+            <form name="f1" action = "authentication.php" onsubmit = "return validation()" method = "POST">
                 <h3>Login Here</h3>
 
-                <label for="username">Username</label>
-                <input type="text" placeholder="Email or Phone" id="username">
+                <label for="user">Username</label>
+                <input type="email" placeholder="Email" id="user" name="user">
 
-                <label for="password">Password</label>
-                <input type="password" placeholder="Password" id="password">
+                <label for="pass">Password</label>
+                <input type="password" placeholder="Password" id="pass" name="pass">
 
                 <button>Log In</button>
             </form>
         </div>
     </div>
+    <script>  
+            function validation()  
+            {  
+                var id=document.f1.user.value;  
+                var ps=document.f1.pass.value;  
+                if(id.length=="" && ps.length=="") {  
+                    alert("User Name and Password fields are empty");  
+                    return false;  
+                }  
+                else  
+                {  
+                    if(id.length=="") {  
+                        alert("User Name is empty");  
+                        return false;  
+                    }   
+                    if (ps.length=="") {  
+                    alert("Password field is empty");  
+                    return false;  
+                    }  
+                }                             
+            }  
+        </script>
 </body>
 
 </html>
