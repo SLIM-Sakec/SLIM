@@ -67,34 +67,45 @@
     </script>
     <?php
   require_once "config.php";
+  $SelectedLab="00";
   // $SelectedLab = $_COOKIE['SelectedLab'];
   $sql = "SELECT * FROM `devices`";
   $all_pc_info = getAllValues($sql);
-
+    
 
 
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if(isset($_POST['city'])){
+                                                
+        $selectedCity = $_POST['city'];
+        setcookie("SelectedLab",$selectedCity,time()+100,"/");
+    }
     if (isset($_POST['action'])) {
-      if ($_POST['action'] == "changeRole") {
+      if ($_POST['action'] == "changeRoleModal") {
         $labAssistantnew=$_POST['labassist'];
         $labno = $_COOKIE['SelectedLab'];
         $labInchargenew=$_POST['labinc'];
-        $olduidla2=$_COOKIE['olduidla'];
-        $olduidlc2=$_COOKIE['olduidlc'];
-         if(isset($_POST['labassist']))
+        $olduidla2=$_POST['olduidla'];
+        $olduidlc2=$_POST['olduidlc'];
+         if($labAssistantnew!="")
          {
-        $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`current_status`='1' WHERE `uid`=$labAssistantnew";
+        $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`labno`=$labno  WHERE `uid`=$labAssistantnew";
         $result = mysqli_query($conn, $sql);
-        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`current_status`='0' WHERE `uid`=$olduidla2";
-        $result = mysqli_query($conn, $sql1);
-
+            if($olduidla2>=1)
+                {
+                $sql1="UPDATE `slim_users` SET `role`='Professor' WHERE `uid`=$olduidla2";
+                $result = mysqli_query($conn, $sql1);
+                }
          }
-         if(isset($_POST['labinc']))
+         if($labInchargenew!="")
          {
-        $sql="UPDATE `slim_users` SET `role`='Lab Incharge',`current_status`='1' WHERE `uid`='$labInchargenew'";
+        $sql="UPDATE `slim_users` SET `role`='Lab Incharge',`labno`=$labno  WHERE `uid`='$labInchargenew'";
         $result = mysqli_query($conn, $sql); 
-        $sql1="UPDATE `slim_users` SET `role`='Proffesor',`current_status`='0' WHERE `uid`=$olduidlc2";
-        $result = mysqli_query($conn, $sql1);
+        if($olduidlc2>=1)
+         {
+            $sql1="UPDATE `slim_users` SET `role`='Professor' WHERE `uid`=$olduidlc2";
+            $result = mysqli_query($conn, $sql1);
+         }  
         }
       }
       else if($_POST['action'] == "addLabModal"){
@@ -113,8 +124,9 @@
         $result = mysqli_query($conn, $sql4);
       }
     }
+    
   }
-
+  $SelectedLab="00";
   ?>
 
     <nav>
@@ -134,7 +146,16 @@
     </nav>
     <div class="ActionBar">
         <div class="deplab">
-
+            <div class="Dep">
+                Department : <select id="DepartmentDropdown">
+                    <option value="">Select a Department</option>
+                </select>
+            </div>
+            <div class="lab">
+                Lab : <select id="LabDropdown">
+                    <option value="">Select a Lab</option>
+                </select>
+            </div>
         </div>
         <div class="options">
             <a href="repair_log.php" style="text-decoration: none;font-size:20px;">Repair Log</a>
@@ -157,7 +178,7 @@
 
             <div class="TT">
                 <?php
-        $finalimage = "SAKEC123.jpg";
+        
         if (isset($_POST['type'])) {
           $type = $_POST['type'];
           if ($type == 1) { ?>
@@ -188,13 +209,14 @@
             ?>
                 <form class="deleteLabModal" method="post">
                     <div>
-                        
+
                         <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Delete LAB</b></h1><br>
                         <div style="display:flex; justify-content: center;">
-                            <input type="hidden" name="action" value="deleteLabModal">    
+                            <input type="hidden" name="action" value="deleteLabModal">
                             <input type="text" class="input"
                                 style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;"
-                                placeholder="Enter Lab Number" name="labno" required></div>
+                                placeholder="Enter Lab Number" name="labno" required>
+                        </div>
                         <div style="display:flex; justify-content: center;"><input type="text" class="input"
                                 style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;"
                                 placeholder="Enter Branch Name" name="branch" required></div>
@@ -205,7 +227,55 @@
                 </form>
                 <?php
           } elseif ($type == 3) {
-               
+             ?>
+                <div id=1exp>
+                    <div class="exp1">
+                        <form class="changeRoleModal" method="post">
+                            <div>
+
+                                <?php
+                        
+                        if(isset($selectedCity)){
+                                                
+                            $selectedOption = $selectedCity ;
+                            // setcookie("SelectedLab",$selectedOption,time()+3600,"/");
+                            $sql="SELECT * FROM `slim_users` WHERE `role`='Lab Incharge' AND `labno`='$selectedOption'";
+                            $li_info = getValue($sql);
+                            $sql="SELECT * FROM `slim_users` WHERE `role`='Lab Assistant' AND `labno`='$selectedOption' ";
+                            $la_info = getValue($sql);
+                        }
+                            ?>
+                                <h1 style="text-align: center; font-size: 50px; color:#12AEF5;"><b>Change Roles</b></h1>
+                                <br>
+                                <div class="deplab">
+
+                                </div>
+                                <div style="display:flex; justify-content: center;">
+
+                                    <input type="hidden" name="action" value="changeRoleModal">
+                                    <input type="hidden" name="olduidla" value="<?php echo $la_info['uid']; ?>">
+                                    <input type="hidden" name="olduidlc" value="<?php echo $li_info['uid']; ?>">
+                                    LAB INCHARGE : <input type="text" class="input" 
+                                        style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;" label="Lab Incharge"
+                                        placeholder="<?php if(isset($selectedCity)) {echo "Current Lab Incharge: ".$li_info['uid'];} else echo "Select Lab Number"; ?> "
+                                        name="labinc" >
+                                </div>
+                                 <div style="display:flex; justify-content: center;">
+                                 LAB ASSISTANT :<input type="text" class="input"
+                                        label="Lab Incharge"
+                                        style="border: #ffffff; padding: 15px 50px 15px 50px; margin-bottom: 20px;"
+                                        placeholder="<?php if(isset($selectedCity)) { echo "Current Lab Assistant: ".$la_info['uid'];}else echo "Select Lab Number"; ?>"
+                                        name="labassist" ></div>
+
+                                <div style="display:flex; justify-content: center;"><button type="submit"
+                                        class="afbutton"
+                                        style="background-color:#DFFFCB;border-radius:5px; border: 1px solid black; padding: 15px 100px 15px 100px; margin: 5px; ">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <?php
           }
         } 
         ?>
@@ -214,46 +284,11 @@
         </div>
     </div>
 
-    
+
 
 
     <div class="footer">
-        <div id="roleChanger">
-            <div class="rolesViewer">
-            <?php
-                                if(isset($_POST['city'])){
-                                                        
-                                    $selectedOption = $_POST['city'];
-                                    $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
-                                    $labAssistant = getValue($sql);
-                                    $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
-                                    $labIncharge = getValue($sql);
-                                    $sql2 = "SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
-                                    $olduidlc= getValue($sql2);
-                                     setcookie("olduidlc",$olduidlc['uid'],time()+3600,"/");
-                                    $sql ="SELECT `uid` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
-                                    $olduidla = getValue($sql);
-                                     setcookie("olduidla",$olduidla['uid'],time()+3600,"/");
 
-                                
-                                } else{
-                                
-                                }
-                                ?>
-                <?php 
-                        if (isset($labAssistant) && isset($labIncharge)) {
-                      ?>
-                <br>&nbsp;&nbsp;&nbsp;&nbsp;Current Lab Incharge : <b><?php echo $labIncharge['fname'];?></b> &nbsp; <b><?php echo $labIncharge['lname'];  ?></b>&nbsp; <b><?php echo $olduidlc['uid'];  ?></b>
-                <br>
-                &nbsp;&nbsp;&nbsp;&nbsp;Current Lab Assistant : <b><?php echo $labAssistant['fname'];?></b> &nbsp; <b><?php echo $labAssistant['lname'];  ?></b>&nbsp; <b><?php echo $olduidla['uid'];  ?></b>
-
-                <?php
-                        }
-                        else{  
-                        }
-                      ?>
-            </div>
-        </div>
         <div>
             Made with &#10083;
         </div>
@@ -421,6 +456,7 @@
 
                     if (country) {
                         var city = 100;
+                        var type = "3";
                         city = country.cities.find(c => c === selectedOption);
                         console.log(city);
 
@@ -428,21 +464,25 @@
                             url: window.location.href,
                             method: 'POST',
                             data: {
-                                city: city
+                                city: city,
+                                type: type
                             },
                             success: function(data) {
                                 var $response = $(
                                 data); // Convert the response to a jQuery object
                                 // Find the specific class within the response
-                                var $specificClass = $response.find('.Grid-container');
+
                                 var $specificClass2 = $response.find('.TT');
-                                var $specificClass3 = $response.find('.rolesViewer');
-                                console.log('Selected elements:',$specificClass);
-                                console.log('Selected elements:',$specificClass2);
-                                console.log('Selected elements:',$specificClass3);
-                               // $("#gridChanger").html($specificClass);
-                                $("#imageChanger").html($specificClass2);
-                                $("#roleChanger").html($specificClass3);
+                                var $specificClass = $response.find('.exp1');
+
+                                console.log('Selected elements class 2:',
+                                    $specificClass2);
+                                console.log('Selected elements class 2:',
+                                    $specificClass);
+
+                                $("#gridChanger").html($specificClass2);
+                                $("#1exp").html($specificClass);
+
                             }
                         });
 

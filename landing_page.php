@@ -1,3 +1,8 @@
+<?php 
+   session_start();
+   require_once "config.php";
+   if (isset($_SESSION['role']) && isset($_SESSION['uid'])) {   ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -218,3 +223,7 @@
     </div>
 </body>
 </html>
+
+<?php }else{
+    header("Location: login_page.php");
+} ?>

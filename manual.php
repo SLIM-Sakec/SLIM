@@ -81,7 +81,6 @@
     </div>
   </nav>
   <div class="ActionBar">
-
     <div class="buttons">
       <button class="EditBtn" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
       <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -119,19 +118,6 @@
                   <span>Subject Code : </span><input type="text" name="subjectcode" id="subjectcode"
                     placeholder="eg: CSC301">
                 </div>
-                <!-- <select name="subject">
-    <option value="Engineering Mathematics-III">Engineering Mathematics-III</option>
-    <option value="Discrete Structures and  Graph Theory">Discrete Structures and  Graph Theory</option>
-    <option value="Data Structure">Data Structure</option>
-    <option value="Digital Logic & Computer Architecture">Digital Logic & Computer Architecture</option>
-    <option value="Computer Graphics">Computer Graphics</option>
-    <option value="Engineering MathematicsIV">Engineering MathematicsIV </option>
-    <option value="Analysis of Algorithm">Analysis of Algorithm</option>
-    <option value="Analysis of Algorithm">Analysis of Algorithm</option>
-    <option value="Operating System">Operating System</option>
-    <option value="Microprocessor">Microprocessor</option>
-    <option value="Theoretical Computer">Theoretical Computer</option>
-</select> -->
                 <button type="submit" name="uploadmanual" id="submit" onclick="submitForm()">Submit</button>
               </form>
             </div>
@@ -142,69 +128,77 @@
         </div>
       </div>
     </div>
+  </div>
+  </div>
 
-  </div>
-  </div>
   <?php
-  require_once 'config.php';
-  $sql = 'SELECT DISTINCT(`year`) FROM `submanuals` ';
+require_once 'config.php';
+$sql = 'SELECT DISTINCT(`year`) FROM `submanuals` ';
 
-  $AllYearInfo = getAllValues($sql);
-  ?>
-  <table>
-    <thead>
-      <tr>
-        <th>Year</th>
-        <th>Semester</th>
-        <th>Subjects</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      foreach ($AllYearInfo as $YearInfo) {
-        $year = $YearInfo['year'];
-        $sql3 = "SELECT COUNT('subjectName') FROM submanuals WHERE year= $year";
-        $rowspan = getAllValues($sql3);
-        ?>
-        <tr>
-          <td rowspan="<?php echo $rowspan[0]['COUNT(\'subjectName\')']; ?>">
-            <?php echo $YearInfo['year'] ?>
-          </td>
-
-          <?php
-          $sql1 = "SELECT DISTINCT(semester) FROM submanuals WHERE year= $year";
-          $AllSeminfo = getAllValues($sql1);
-          foreach ($AllSeminfo as $SemInfo) {
-            $sem = $SemInfo['semester'];
-            $sql3 = "SELECT COUNT('subjectName') FROM submanuals WHERE semester= $sem";
-            $rowspan = getAllValues($sql3);
-            ?>
-            <td rowspan="<?php echo $rowspan[0]['COUNT(\'subjectName\')']; ?>">
-              <?php echo $SemInfo['semester'] ?>
-            </td>
-            <?php
-            $sql2 = "SELECT DISTINCT * FROM submanuals WHERE year=$year AND semester = $sem";
-            $AllSubInfo = getAllValues($sql2);
-            foreach ($AllSubInfo as $SubInfo) {
-              ?>
-              <td>
-                <ul>
-                  <li><a href="upload/submanual/<?php echo $SubInfo['filename']; ?>" target='blank'>
-                      <?php echo $SubInfo['subjectName'] ?>
-                    </a></li>
-                </ul>
-              </td>
-            </tr>
-            <?php
-            }
-          }
-      }
+$AllYearInfo = getAllValues($sql);
+?>
+<table>
+  <thead>
+    <tr>
+      <th>Year</th>
+      <th>Semester</th>
+      <th>Subjects</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    foreach ($AllYearInfo as $YearInfo) {
+      $year = $YearInfo['year'];
+      $sql3 = "SELECT COUNT('subjectName') FROM submanuals WHERE year= $year";
+      $rowspan = getAllValues($sql3);
       ?>
-      <!-- Add more semesters for Year 1 if needed -->
-      <!-- Repeat the structure for other years -->
-    </tbody>
-  </table>
+      <tr>
+        <td rowspan="<?php echo $rowspan[0]['COUNT(\'subjectName\')']; ?>">
+          <?php echo $YearInfo['year'] ?>
+        </td>
 
+        <?php
+        $sql1 = "SELECT DISTINCT(semester) FROM submanuals WHERE year= $year";
+        $AllSeminfo = getAllValues($sql1);
+        foreach ($AllSeminfo as $SemInfo) {
+          $sem = $SemInfo['semester'];
+          $sql3 = "SELECT COUNT('subjectName') FROM submanuals WHERE semester= $sem";
+          $rowspan = getAllValues($sql3);
+          ?>
+          <td rowspan="<?php echo $rowspan[0]['COUNT(\'subjectName\')']; ?>">
+            <?php echo $SemInfo['semester'] ?>
+          </td>
+          <?php
+          $sql2 = "SELECT DISTINCT * FROM submanuals WHERE year=$year AND semester = $sem";
+          $AllSubInfo = getAllValues($sql2);
+          foreach ($AllSubInfo as $SubInfo) {
+            ?>
+            <td>
+              <ul>
+                <li><a href="pdf_viewer.html?file=<?php echo $SubInfo['filename']; ?>" target="_blank">
+                    <?php echo $SubInfo['subjectName'] ?>
+                  </a></li>
+              </ul>
+            </td>
+          </tr>
+          <?php
+          }
+        }
+    }
+    ?>
+  </tbody>
+</table>
+
+  <!-- Add the iframe for displaying PDFs -->
+  <iframe id="pdfIframe" class="pdf-container" style="width: 100%; height: 80vh; border: none;"></iframe>
+
+  <script>
+    function showPDF(file) {
+      var iframe = document.getElementById('pdfIframe');
+      iframe.src = 'get_pdf.php?file=' + file;
+    }
+  </script>
 </body>
+
 
 </html>

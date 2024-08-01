@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Viewer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <style>
+    .pdf-page {
+      width: 80%;
+      margin: 20px 0;
+    }
+    #pdf-loader {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="pdf-loader">Loading PDF...</div>
+  <div id="pdf-container"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pdfFile = urlParams.get('file');
+      
+      if (pdfFile) {
+        const url = 'upload/submanual/' + pdfFile;
+        document.getElementById('pdf-loader').style.display = 'block';
+
+        const loadingTask = pdfjsLib.getDocument(url);
+        loadingTask.promise.then(function(pdf) {
+          console.log('PDF loaded');
+          document.getElementById('pdf-loader').style.display = 'none';
+
+          const container = document.getElementById('pdf-container');
+          const totalPages = pdf.numPages;
+          
+          for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+            pdf.getPage(pageNum).then(function(page) {
+              const viewport = page.getViewport({ scale: 2 });
+              const canvas = document.createElement('canvas');
+              canvas.className = 'pdf-page';
+              const context = canvas.getContext('2d');
+              canvas.height = viewport.height;
+              canvas.width = viewport.width;
+              container.appendChild(canvas);
+              
+              const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+              };
+              const renderTask = page.render(renderContext);
+              renderTask.promise.then(function() {
+                console.log('Page rendered');
+              });
+            });
+          }
+        }, function(reason) {
+          console.error('Error loading PDF: ', reason);
+          document.getElementById('pdf-loader').innerHTML = 'Failed to load PDF';
+        });
+      } else {
+        document.body.innerHTML = '<p>No PDF file specified.</p>';
+      }
+    });
+  </script>
+</body>
+</html>

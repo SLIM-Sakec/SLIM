@@ -250,7 +250,7 @@
         </div>
         <div class="vl"></div>
         <div>
-            <form name="f1" action = "authentication.php" onsubmit = "return validation()" method = "POST">
+            <form name="f1" action = "authentication.php" onsubmit="return validation()"  method = "POST">
                 <h3>Login Here</h3>
 
                 <label for="user">Username</label>
@@ -259,7 +259,7 @@
                 <label for="pass">Password</label>
                 <input type="password" placeholder="Password" id="pass" name="pass">
 
-                <button>Log In</button>
+                <button type="submit">Log In</button>
             </form>
         </div>
     </div>

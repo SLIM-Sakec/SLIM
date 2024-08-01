@@ -1,3 +1,8 @@
+<?php 
+   session_start();
+
+   if (isset($_SESSION['role']) && isset($_SESSION['uid'])) {   ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +17,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" type= "text/css" media="screen" href="style.php">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <title>SLIM</title>
 
 
@@ -28,7 +33,7 @@
         window.history.replaceState( null, null, window.location.href );
     }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <?php
   require_once "config.php";
   // $SelectedLab = $_COOKIE['SelectedLab'];
@@ -50,7 +55,7 @@
         $submsk = $_POST['submsk'];
         $pcname = $_POST['pcname'];
         $processor = $_POST['processor'];
-        $cpuspeed= $_POST['cpuspeed'];
+        $cpuspeed= $_POST['CPUspeed'];
         $memory = $_POST['memory'];
         $harddisk = $_POST['harddisk'];
         $dvd = $_POST['dvd'];
@@ -137,7 +142,7 @@
           <div class="collapse collapse-horizontal" id="collapseWidthExample" style="position:absolute; align-items: right;" >
             <div class="card card-body" style="width: 300px; ">
               This is some placeholder content for a horizontal collapse. It's hidden by default and shown when triggered.
-              <a href="login_page.php"><button>logout</button></a>
+              <a href="logout.php"><button>logout</button></a>
             </div>
           </div>
         
@@ -157,6 +162,9 @@
         </select>
       </div>
     </div>
+    <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge"){
+
+    echo <<<EOD
     <div class="buttons">
 
       <button type="button" class="Add" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#addDeivce">ADD</button>
@@ -164,6 +172,10 @@
       <button type="button" class="Update" style="background-color:#CBDAFF;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#updateDeivce">UPDATE</button>
       <button type="button" class="Report" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#ReportDeivce">Report Error</button>
     </div>
+    EOD;
+    }
+    ?>
+
   </div>
   <div class="Hero">
     <div class="SideNav">
@@ -189,9 +201,9 @@
                   $ttinfo1 = json_encode($ttinfo);               
                   $ttinfo2 = substr($ttinfo1,14);
                   setcookie("timetable", $ttinfo2, time() + 3600, "/");
-                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' AND `current_status`=1";
+                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' ";
                   $labAssistant = getValue($sql);
-                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' AND `current_status`=1";
+                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' ";
                   $labIncharge = getValue($sql);
 
                                 
@@ -306,93 +318,173 @@
           </div>
       </div> 
     </div>
-  <div class="modal fade" id="addDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addDeivceLabel" aria-hidden="true">
+    <div class="modal fade" id="addDeivce" tabindex="-1" aria-labelledby="addDeivceLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addDeivceLabel">System Information</h1>
+          <h1 class="modal-title fs-5" id="addDeivceLabel">Add New PC Information</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form class="modal-content" action="labdetails.php" method="post">
-            <div class="container addContainer">
-              <h1>ADD A NEW PC</h1>
-              <p>Please fill in this form to add a new system.</p>
-              <hr>
-              <input type="hidden" name="action" value="add">
-              <label for="pcno"><b>pc number</b></label>
-              <input type="text" placeholder="enter the pc number" name="pcno" required><br>
+            <form class="modal-content" action="labdetails.php" method="post">
+              <div class="container-fluid">
+                <div class="mb-3 row">
+                <input type="hidden" name="action" value="add">
+                    <label for="pcno" class="col-sm-4 col-form-label"><b>PC Number:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter the PC number" name="pcno" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3 row">
+                    <label for="mname" class="col-sm-4 col-form-label"><b>Machine Name:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine name" name="mname" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3 row">
+                    <label for="msno" class="col-sm-4 col-form-label"><b>Machine Serial Number:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine serial number" name="msno" required>
+                    </div>
+                </div>
 
-              <label for="mname"><b>machine name</b></label>
-              <input type="text" placeholder="Enter machine name" name="mname" required><br>
+                <div class="mb-3 row">
+                    <label for="ksno" class="col-sm-4 col-form-label"><b>Keyboard Serial Number:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter keyboard serial number" name="ksno" required>
+                    </div>
+                </div>
 
-              <label for="msno"><b>machine serial number</b></label>
-              <input type="text" placeholder="enter machine serial number" name="msno" required><br>
+                <div class="mb-3 row">
+                    <label for="muno" class="col-sm-4 col-form-label"><b>Mouse Serial Number:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter mouse serial number" name="muno" required>
+                    </div>
+                </div>
 
-              <label for="ksno"><b>keyboard serial number</b></label>
-              <input type="text" placeholder="enter keyboard serial number" name="ksno" required><br>
+                <div class="mb-3 row">
+                    <label for="mono" class="col-sm-4 col-form-label"><b>Monitor Serial Number:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter monitor serial number" name="mono" required>
+                    </div>
+                </div>
 
-              <label for="muno"><b>mouse serial number</b></label>
-              <input type="text" placeholder="enter mouse serial number" name="muno" required><br>
+                <div class="mb-3 row">
+                    <label for="ip" class="col-sm-4 col-form-label"><b>IP address</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine IP address" name="ip" required>
+                    </div>
+                </div>
 
-              <label for="mono"><b>monitor serial number</b></label>
-              <input type="text" placeholder="enter monitor serial number" name="mono" required><br>
+                <div class="mb-3 row">
+                    <label for="submsk" class="col-sm-4 col-form-label"><b>Subnet Mask Number</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine subnet mask" name="submsk" required>
+                    </div>
+                </div>
 
-              <label for="ip"><b>IP address</b></label>
-              <input type="text" placeholder="enter machine ip adress" name="ip" required><br>
+                <div class="mb-3 row">
+                    <label for="pcname" class="col-sm-4 col-form-label"><b>PC Name:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter PC name" name="pcname" required>
+                    </div>
+                </div>
 
-              <label for="submsk"><b>subnet mask number</b></label>
-              <input type="text" placeholder="enter machine submsk" name="submsk" required><br>
+                <div class="mb-3 row">
+                    <label for="processor" class="col-sm-4 col-form-label"><b>Processor:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine processor" name="processor" required>
+                    </div>
+                </div>
 
-              <label for="pcname"><b>PCname</b></label>
-              <input type="text" placeholder="enter pc name" name="pcname" required><br>
+                <div class="mb-3 row">
+                    <label for="CPUspeed" class="col-sm-4 col-form-label"><b>CPU Speed:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter CPU speed" name="CPUspeed" required>
+                    </div>
+                </div>
 
-              <label for="processor"><b>Processor</b></label>
-              <input type="text" placeholder="enter machine processor" name="processor" required><br>
+                <div class="mb-3 row">
+                    <label for="memory" class="col-sm-4 col-form-label"><b>Memory Size (RAM):</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter machine memory size" name="memory" required>
+                    </div>
+                </div>
 
-              <label for="CPUspeed1"><b>CPUspeed</b></label>
-              <input type="text" placeholder="enter machine cpu speed" name="CPUspeed1" required><br>
+                <div class="mb-3 row">
+                    <label for="harddisk" class="col-sm-4 col-form-label"><b>Disk Size (HDD):</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter hard disk size" name="harddisk" required>
+                    </div>
+                </div>
 
-              <label for="memory"><b>memory size RAM </b></label>
-              <input type="text" placeholder="enter machine memory size" name="memory" required><br>
+                <div class="mb-3 row">
+                    <label for="dvd" class="col-sm-4 col-form-label"><b>DVD Type:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter DVD ROM type" name="dvd" required>
+                    </div>
+                </div>
 
-              <label for="harddisk"><b>HARD DISK SIZE</b></label>
-              <input type="text" placeholder="enter hard disk SIZE" name="harddisk" required><br>
-              
-              <label for="cpuspeed"><b>CPU SPEED</b></label>
-              <input type="text" placeholder="enter DVD ROM TYPE" name="cpuspeed" required><br>
+                <div class="mb-3 row">
+                    <label for="display" class="col-sm-4 col-form-label"><b>Display:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter display specifications" name="display" required>
+                    </div>
+                </div>
 
-              <label for="dvd"><b>DVD TYPE</b></label>
-              <input type="text" placeholder="enter DVD ROM TYPE" name="dvd" required><br>
+                <div class="mb-3 row">
+                    <label for="sound" class="col-sm-4 col-form-label"><b>Speakers:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter speaker specifications" name="sound" required>
+                    </div>
+                </div>
 
-              <label for="display"><b>display specs</b></label>
-              <input type="text" placeholder="enter display specs" name="display" required><br>
+                <div class="mb-3 row">
+                    <label for="lancard" class="col-sm-4 col-form-label"><b>LAN card Type:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter LAN card type" name="lancard" required>
+                    </div>
+                </div>
 
-              <label for="sound"><b>sound specs</b></label>
-              <input type="text" placeholder="enter sound specs" name="sound" required><br>
+                <div class="mb-3 row">
+                    <label for="monitor" class="col-sm-4 col-form-label"><b>Monitor Model:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter monitor model" name="monitor" required>
+                    </div>
+                </div>
 
-              <label for="lancard"><b>lancard type</b></label>
-              <input type="text" placeholder="enter lan card type" name="lancard" required><br>
+                <div class="mb-3 row">
+                    <label for="keyboard" class="col-sm-4 col-form-label"><b>Keyboard Model:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter keyboard model" name="keyboard" required>
+                    </div>
+                </div>
 
-              <label for="monitor"><b>monitor model</b></label>
-              <input type="text" placeholder="enter monitor model" name="monitor" required><br>
+                <div class="mb-3 row">
+                    <label for="mouse" class="col-sm-4 col-form-label"><b>Mouse Model:</b></label>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" placeholder="Enter mouse model" name="mouse" required>
+                    </div>
+                </div>
 
-              <label for="keyboard"><b>keyboard model</b></label>
-              <input type="text" placeholder="enter keyboard model" name="keyboard" required><br>
-
-              <label for="mouse"><b>mouse model</b></label>
-              <input type="text" placeholder="enter mouse model" name="mouse" required><br>
-
-              <label for="softwares"><b>softwares in the pc</b></label>
-              <input type="text" placeholder="enter softwares in the machine" name="softwares" required><br>
-
-
-              <div class="clearfix">
-                <button type="submit" class="signup">Submit</button>
-              </div>
+                <div class="mb-3 row">
+                    <label for="softwares" class="col-sm-4 col-form-label"><b>Softwares Installed:</b></label>
+                    <div class="col-sm-8">
+                      <textarea class="form-control" placeholder="Enter softwares in the machine" name="softwares" required rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="clearfix">
+            <button type="submit" class="btn btn-primary signup">Save</button>
+          </div>
             </div>
-          </form>
+            
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          
         </div>
       </div>
     </div>
@@ -774,3 +866,7 @@
 </body>
 
 </html>
+
+<?php }else{
+    header("Location: login_page.php");
+} ?>

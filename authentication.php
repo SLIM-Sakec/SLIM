@@ -1,4 +1,5 @@
-<?php      
+<?php    
+    session_start();
    require_once "config.php"; 
     $email = $_POST['user'];  
     $password = $_POST['pass'];  
@@ -15,7 +16,12 @@
         $count = mysqli_num_rows($result);  
           
         if($count == 1){  
-            
+            $_SESSION['uid'] = $row['uid'];
+            $_SESSION['email'] = $row['email'];
+            $_SESSION['fname'] = $row['fname'];
+            $_SESSION['lname'] = $row['lname'];
+            $_SESSION['role'] = $row['role'];
+            $_SESSION['labno'] = $row['labno'];
             echo "<h1><center> Login successful </center></h1>";  
             header("Location: ./landing_page.php");
         }  
