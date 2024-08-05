@@ -1,3 +1,8 @@
+<?php 
+   session_start();
+
+   if (isset($_SESSION['role']) && isset($_SESSION['uid'])) {   ?>
+
 <?php
 include("repairData.php");
 ?>
@@ -58,17 +63,28 @@ include("repairData.php");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['action'])) {
       if ($_POST['action'] == "repair") {
+        $dtype = $_POST['dtype'];
         $pcno = $_POST['pcno'];
         $labno=$_POST['labno'];
         $issue=$_POST['issue'];
         $ed = $_POST['ed'];
         $remarks = $_POST['remarks'];
         $date = date('Y-m-d H:i:s');
+        if($dtype=='pc'){
         $sql= "UPDATE `repair_log` SET `labno`='$labno',`device_no`='$pcno',`kharab_date`='$ed',`repair_date`='$date',`issue`='$issue',`remarks`='$remarks' WHERE `device_no` ='$pcno' AND `kharab_date` = '$ed'";
         $sql1="UPDATE `devices` SET `isworking`='1' WHERE `pcno`='$pcno' ";
         $result = mysqli_query($conn, $sql);
         $result1 = mysqli_query($conn, $sql1);
         echo "<meta http-equiv='refresh' content='0'>";
+        }
+        elseif($dtype=='printer'){
+        $sql= "UPDATE `repair_log` SET `labno`='$labno',`device_no`='$pcno',`kharab_date`='$ed',`repair_date`='$date',`issue`='$issue',`remarks`='$remarks' WHERE `device_no` ='$pcno' AND `kharab_date` = '$ed'";
+        $sql1="UPDATE `extra_devices` SET `isworking`='1' WHERE `dsno`='$pcno' ";
+        $result = mysqli_query($conn, $sql);
+        $result1 = mysqli_query($conn, $sql1);
+        echo "<meta http-equiv='refresh' content='0'>";
+        }
+        
       }
     }
   }
@@ -81,10 +97,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </h1>
       </div>
       <div class="NavItem">
-        <a href="labdetails.php">HOME</a>
-        <a href="#">CONTACT</a>
-        <a href="#">ABOUT</a>
-        <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i>
+        <a href="landing_page.php">HOME</a>
+        <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
+        <a href="logout.php"><button class="btn btn-primary">logout</button></a>
       </div>
     </div>
   </nav>
@@ -99,7 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <tr>
           <th>Ticket No </th>
           <th>Lab number</th>
-          <th>Pc Number</th>
+          <th>Device type </th>
+          <th>Device Number</th>
           <th>Date of Issue</th>
           <th>Status</th>
           <th>Issue</th>
@@ -115,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <tr>
       <td><?php echo $data['ticketno']??''; ?></td>
       <td><?php echo $data['labno']??''; ?></td>
+      <td><?php echo $data['dtype']??''; ?></td>
       <td><?php echo $data['device_no']??''; ?></td>
       <td><?php echo $data['kharab_date']??''; ?></td>
       <td><?php 
@@ -127,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
       ?>
   
-    </td>
+      </td>
       <td><?php echo $data['issue']??''; ?></td>
       <td><?php echo $data['repair_date']??''; ?></td>
 
@@ -158,6 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <form id="repair_form" action="repair_log.php" method="post">
                     <input type="hidden" name="action" value="repair">
                     <input type="hidden" name="labno" value="<?php echo $data['labno'] ?>">
+                    <input type="hidden" name="dtype" value="<?php echo $data['dtype'] ?>">
                     <input type="hidden" name="ed" value="<?php echo $data['kharab_date'] ?>">
                     <input type="hidden" name="pcno" value="<?php echo $data['device_no'] ?>">
                     <input type="hidden" name="issue" value="<?php echo $data['issue'] ?>">
@@ -210,3 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </script>
 </body>
 </html>
+
+<?php }else{
+    header("Location: login_page.php");
+} ?>

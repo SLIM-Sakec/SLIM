@@ -4,6 +4,9 @@ require_once "config.php";
 // $SelectedLab = $_COOKIE['SelectedLab'];
 $sql = "SELECT * FROM `devices`";
 $all_pc_info = getAllValues($sql);
+$sql = "SELECT * FROM `extra_devices`";
+$all_ex_info = getAllValues($sql);
+
 ?>
 
 <?php foreach ($all_pc_info as $pc_info) {
@@ -18,7 +21,37 @@ $all_pc_info = getAllValues($sql);
 
 ?>
 
+
+
 .Item-icon<?php echo $pc_info['pcno'];?>{
+width: 120px;
+height: 71px;
+text-align: center;
+border: 1px solid rgb(71, 71, 71);
+background-color: <?php echo $bgcol;?>;
+padding: 20px;
+padding-top: 30px;
+}
+<?php
+}
+
+?>
+
+<?php foreach ($all_ex_info as $ex_info) {
+    
+    
+    if ($ex_info['isworking']==1) {
+        $bgcol = '#DFFFCB';
+    } else {
+        $bgcol = '#FFCBCB';
+    }
+
+
+?>
+
+
+
+.Item-icon<?php echo $ex_info['dsno'];?>{
 width: 120px;
 height: 71px;
 text-align: center;

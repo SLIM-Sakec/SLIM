@@ -7,15 +7,35 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
   <style>
     .pdf-page {
-      width: 80%;
+      width: 100%;
       margin: 20px 0;
+      position: relative;
     }
     #pdf-loader {
       display: none;
       text-align: center;
       margin-top: 20px;
     }
+    /* Disable right-click */
+    body {
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+/Edge */
+      user-select: none; /* Standard */
+    }
+    /* Overlay to prevent screen capturing */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgb(255, 255, 255);
+      z-index: 9999; /* Invisible but intercepts interactions */
+      display: none; /* Allows underlying interactions */
+    }
   </style>
+  
 </head>
 <body>
   <div id="pdf-loader">Loading PDF...</div>
@@ -25,6 +45,23 @@
       const urlParams = new URLSearchParams(window.location.search);
       const pdfFile = urlParams.get('file');
       
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay';
+      document.body.appendChild(overlay);
+
+      function showOverlay() {
+          overlay.style.height = window.innerHeight + '%';
+          overlay.style.width = window.innerWidth + '%';
+          overlay.style.display = 'block';
+          setTimeout(function() {
+            alert('Screenshot not allowed!!');
+        }, 10);
+      }
+
+      function hideOverlay() {
+          overlay.style.display = 'none';
+      }
+
       if (pdfFile) {
         const url = 'upload/submanual/' + pdfFile;
         document.getElementById('pdf-loader').style.display = 'block';
@@ -39,13 +76,20 @@
           
           for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
             pdf.getPage(pageNum).then(function(page) {
-              const viewport = page.getViewport({ scale: 2 });
+              const viewport = page.getViewport({ scale: 1.5 });
               const canvas = document.createElement('canvas');
               canvas.className = 'pdf-page';
               const context = canvas.getContext('2d');
               canvas.height = viewport.height;
               canvas.width = viewport.width;
               container.appendChild(canvas);
+
+              // Add an invisible overlay to prevent screenshots
+              // const overlay = document.createElement('div');
+             // overlay.className = 'overlay';
+             // overlay.style.height = viewport.height + 'px';
+            //overlay.style.width = viewport.width + 'px';
+             // canvas.parentNode.insertBefore(overlay, canvas.nextSibling); 
               
               const renderContext = {
                 canvasContext: context,
@@ -64,6 +108,38 @@
       } else {
         document.body.innerHTML = '<p>No PDF file specified.</p>';
       }
+
+
+      document.addEventListener('keydown', function(event) {
+        event.preventDefault();
+        window.location.replace("http://localhost/slim/manual.php");
+        
+        
+    });
+    
+      // Disable right-click
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+      });
+
+      
+      // Disable keyboard shortcuts
+      //document.addEventListener('keydown', function(e) {
+       // if (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u' || e.key === 'Shift' || e.key === 'i')) {
+       //   e.preventDefault();
+       // }
+       // if (e.key === 'PrintScreen') {
+       //   e.preventDefault();
+       // }
+        
+       // document.addEventListener('keydown', function(event) {
+       //   if (event.metaKey && event.shiftKey ) {
+       //       // Attempt to clear clipboard content
+       //       showOverlay();
+              
+       //   }
+       // });
+     // });
     });
   </script>
 </body>

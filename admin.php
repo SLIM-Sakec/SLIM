@@ -1,3 +1,9 @@
+<?php 
+   session_start();
+
+   if (isset($_SESSION['role']) && isset($_SESSION['uid']) && $_SESSION['role']=="admin") {   ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -138,9 +144,8 @@
             </div>
             <div class="NavItem">
                 <a href="landing_page.php">HOME</a>
-                <a href="#">CONTACT</a>
-                <a href="#">ABOUT</a>
-                <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i>
+                <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
+        <a href="logout.php"><button class="btn btn-primary" >logout</button></a>
             </div>
         </div>
     </nav>
@@ -159,6 +164,7 @@
         </div>
         <div class="options">
             <a href="repair_log.php" style="text-decoration: none;font-size:20px;">Repair Log</a>
+            <a href="reportfile.php" style="text-decoration: none;font-size:20px;">Report Generator</a>
         </div>
     </div>
     <div class="Hero">
@@ -503,3 +509,7 @@
 </body>
 
 </html>
+
+<?php }else{
+    header("Location: login_page.php");
+} ?>

@@ -1,3 +1,8 @@
+<?php 
+   session_start();
+
+   if (isset($_SESSION['role']) && isset($_SESSION['uid'])) {   ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,16 +78,22 @@
         </h1>
       </div>
       <div class="NavItem">
-        <a href="labdetails.php">HOME</a>
-        <a href="#">CONTACT</a>
-        <a href="#">ABOUT</a>
-        <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i>
+        <a href="landing_page.php">HOME</a>
+        <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
+        <a href="logout.php"><button class="btn btn-primary">logout</button></a>
       </div>
     </div>
   </nav>
   <div class="ActionBar">
     <div class="buttons">
-      <button class="EditBtn" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
+    <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge" || $_SESSION['role']=="admin"){
+
+    echo <<<EOD
+        
+            <button class="EditBtn" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
+     
+        EOD;
+        }?>
       <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -202,3 +213,7 @@ $AllYearInfo = getAllValues($sql);
 
 
 </html>
+
+<?php }else{
+    header("Location: login_page.php");
+} ?>

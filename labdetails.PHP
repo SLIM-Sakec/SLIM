@@ -33,18 +33,47 @@
         window.history.replaceState( null, null, window.location.href );
     }
 </script>
+<script>
+function formToggle(ID){
+    var element = document.getElementById(ID);
+    if(element.style.display === "none"){
+        element.style.display = "block";
+    }else{
+        element.style.display = "none";
+    }
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <?php
   require_once "config.php";
-  // $SelectedLab = $_COOKIE['SelectedLab'];
+
   $sql = "SELECT * FROM `devices`";
   $all_pc_info = getAllValues($sql);
+  $sql = "SELECT * FROM `extra_devices`";
+  $all_ex_info = getAllValues($sql);
 
  
 
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if(isset($_POST['city'])){                                    
+      $selectedOption = $_POST['city'];
+      $SelectedLab=$selectedOption;
+      setcookie("SelectedLab",$selectedOption,time()+50,"/");
+      $sql = "SELECT `file_name` FROM `files` WHERE `timestamp` = (SELECT MAX(`timestamp`) FROM `files` WHERE `category` = 'layout' AND `lab` = $selectedOption)";
+                $ttinfo1= getValue($sql);
+                $ttinfo1 = json_encode($ttinfo1);
+                $ttinfo1 = substr($ttinfo1,14);
+                $layout=$ttinfo1;
+                setcookie("layout", $ttinfo1, time() + 50, "/");
+                $sql = "SELECT `file_name` FROM `files` WHERE `timestamp` = (SELECT MAX(`timestamp`) FROM `files` WHERE `category` = 'timetable' AND `lab` = $selectedOption)";
+                $ttinfo2 = getValue($sql);
+                $ttinfo2 = json_encode($ttinfo2);               
+                $ttinfo2 = substr($ttinfo2,14);
+                $timetable=$ttinfo2;
+                setcookie("timetable", $ttinfo2, time() + 50, "/");
+    }
     if (isset($_POST['action'])) {
-      if ($_POST['action'] == "add") {
+      if ($_POST['action'] == "add" ) {
         $pcno = $_POST['pcno'];
         $mname = $_POST['mname'];
         $msno = $_POST['msno'];
@@ -66,33 +95,57 @@
         $mouse = $_POST['mouse'];
         $softwares  = $_POST['softwares'];
         $dept='comps';
-        $labno = $_COOKIE["SelectedLab"];
+        $labno = $_COOKIE['SelectedLab'];
         $lancard = $_POST['lancard'];
-
+        if($_SESSION['labno']==$labno || $_SESSION['role']=='admin'){
         $sql1 =
           "INSERT INTO `devices`(`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
           VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0')";
         $result = mysqli_query($conn, $sql1);
-      } else if ($_POST['action'] == "report") {
-        $labno = $_COOKIE["SelectedLab"];
+        }
+        else {
+          echo '<script>alert("No access for this lab")</script>';
+        }
+      } else if ($_POST['action'] == "report" ) {
+        $dtype = $_POST['dtype'];
+        $labno = $_COOKIE['SelectedLab'];
         $pcno = $_POST['pcno'];
         $issue = $_POST['issue'];
         $currentDateTimeNumeric = date("YmdHis");
-        $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`,`ticketno`) VALUES ('$labno','$pcno','$issue','','$currentDateTimeNumeric')";
-        $sql2 = "UPDATE `devices` SET `isworking` = 0 WHERE `pcno`= '$pcno'";
-        $result = mysqli_query($conn, $sql1);
-        $result = mysqli_query($conn, $sql2);
-        echo "<meta http-equiv='refresh' content='0'>";
+        if($_SESSION['labno']==$labno || $_SESSION['role']=='admin'){
+          if($dtype=='pc'){
+          $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`,`ticketno`, `dtype`) VALUES ('$labno','$pcno','$issue','','$currentDateTimeNumeric','$dtype')";
+          $sql2 = "UPDATE `devices` SET `isworking` = 0 WHERE `pcno`= '$pcno'";
+          $result = mysqli_query($conn, $sql1);
+          $result = mysqli_query($conn, $sql2);
+          echo "<meta http-equiv='refresh' content='0'>";
+          }
+          else if($dtype=='printer'){
+            $sql1 = "INSERT INTO `repair_log`(`labno`, `device_no`,`issue`, `remarks`,`ticketno`, `dtype`) VALUES ('$labno','$pcno','$issue','','$currentDateTimeNumeric','$dtype')";
+          $sql2 = "UPDATE `extra_devices` SET `isworking` = 0 WHERE `dsno`= '$pcno'";
+          $result = mysqli_query($conn, $sql1);
+          $result = mysqli_query($conn, $sql2);
+          echo "<meta http-equiv='refresh' content='0'>";
+          }
+        }
+        else {
+          echo '<script>alert("No access for this lab")</script>';
+        }
+      
       }
-      else if ($_POST['action'] == "delete") {
-        $labno = $_COOKIE["SelectedLab"];
+      else if ($_POST['action'] == "delete" ) {
+        $labno = $_COOKIE['SelectedLab'];
         $pcno = $_POST['pcno'];
-        $sql1 = "DELETE FROM `devices` WHERE `pcno`='$pcno'";
+        if($_SESSION['labno']==$labno || $_SESSION['role']=='admin'){
+          $sql1 = "DELETE FROM `devices` WHERE `pcno`='$pcno'";
 
-        $result = mysqli_query($conn, $sql1);
-
+          $result = mysqli_query($conn, $sql1);
+        }
+        else {
+          echo '<script>alert("No access for this lab")</script>';
+        }
       }
-      else if ($_POST['action'] == "update") {
+      else if ($_POST['action'] == "update" ) {
         $pcno = $_POST['pcno'];
         $mname = $_POST['mname'];
         $msno = $_POST['msno'];
@@ -114,14 +167,32 @@
         $mouse = $_POST['mouse'];
         $softwares  = $_POST['softwares'];
         $dept='comps';
-        $labno = $_COOKIE["SelectedLab"];
+        $labno = $_COOKIE['SelectedLab'];
         $lancard = $_POST['lancard'];
-
-        $sql1 =
-          "UPDATE `devices` SET (`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
-          VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0') WHERE 'pcno'=$pcno";
-        $result = mysqli_query($conn, $sql1);
+        if($_SESSION['labno']==$labno || $_SESSION['role']=='admin'){
+          $sql1 =
+            "UPDATE `devices` SET (`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
+            VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0') WHERE 'pcno'=$pcno";
+          $result = mysqli_query($conn, $sql1);
+        }
+        else {
+          echo '<script>alert("No access for this lab")</script>';
+        }
       }
+      else if ($_POST['action'] == "transfer" )
+      {
+        $pcno = $_POST['pcno'];
+        $newlab= $_POST['newlab'];
+
+        if($_SESSION['role']=='admin'){
+          $sql= "UPDATE `devices` SET `labno` = '$newlab' WHERE `pcno`='$pcno'";
+          $result = mysqli_query($conn, $sql);
+        }
+        else {
+          echo '<script>alert("No access for this lab")</script>';
+        }
+      }
+    
     }
   }
   ?>
@@ -135,16 +206,14 @@
       </div>
       <div class="NavItem">
         <a href="landing_page.php">HOME</a>
-        <a href="#">CONTACT</a>
-        <a href="#">ABOUT</a>
-        <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" > <i class="fa-solid fa-circle-user fa-2xl" style="color: #2596ff;"></i></a>  
+        <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
+        <a href="logout.php"><button class="btn btn-primary">logout</button></a>
         
-          <div class="collapse collapse-horizontal" id="collapseWidthExample" style="position:absolute; align-items: right;" >
-            <div class="card card-body" style="width: 300px; ">
-              This is some placeholder content for a horizontal collapse. It's hidden by default and shown when triggered.
-              <a href="logout.php"><button>logout</button></a>
+          <!-- <div class="collapse collapse-horizontal" id="collapseWidthExample" style="position:absolute; align-items: right;" >
+            <div class="card card-body" style=" float:right; width: 100px; ">
+              
             </div>
-          </div>
+          </div> -->
         
       </div>
     </div>
@@ -162,18 +231,17 @@
         </select>
       </div>
     </div>
-    <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge"){
+    <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge" || $_SESSION['role']=="admin"){
 
-    echo <<<EOD
-    <div class="buttons">
-
-      <button type="button" class="Add" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#addDeivce">ADD</button>
-      <button type="button" class="delete" style="background-color:#FFCBCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#deleteDeivce">Delete</button>
-      <button type="button" class="Update" style="background-color:#CBDAFF;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#updateDeivce">UPDATE</button>
-      <button type="button" class="Report" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#ReportDeivce">Report Error</button>
-    </div>
-    EOD;
-    }
+      echo  <<<EOD
+              <div class="buttons">  
+                <button type="button" class="Add" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#addDeivce">ADD</button>
+                <button type="button" class="delete" style="background-color:#FFCBCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#deleteDeivce">DELETE</button>
+                <button type="button" class="Update" style="background-color:#CBDAFF;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#transferDeivce">TRANSFER</button>
+                <button type="button" class="Report" style="background-color:#DFFFCB;border: 1px solid black;padding:0 10px 0 10px;" data-bs-toggle="modal" data-bs-target="#ReportDeivce">REPORT ERROR</button> 
+              </div>
+            EOD;
+      }
     ?>
 
   </div>
@@ -181,36 +249,39 @@
     <div class="SideNav">
       <ul style="margin-top: 50px; padding:20px;">
         <li><a href="manual.php" style="text-decoration: none;font-size:20px;">Subject Manual</a></li>
-        <li><a href="repair_log.php" style="text-decoration: none;font-size:20px;">Repair Log</a></li>
+          <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge" || $_SESSION['role']=="admin"){
+
+          echo <<<EOD
+                  <li><a href="repair_log.php" style="text-decoration: none;font-size:20px;">Repair Log</a></li>
+                EOD;
+          }
+          ?>
+          <?php if($_SESSION['role']=="admin"){
+
+          echo <<<EOD
+                  <li><a href="admin.php" style="text-decoration: none;font-size:20px;">Admin Page</a></li>
+                EOD;
+          }
+          ?>
       </ul>
     </div>
     <div id="gridChanger">
         <div class="Grid-container">
               <?php
-              if(isset($_POST['city'])){
-                                    
-                $selectedOption = $_POST['city'];
-                  setcookie("SelectedLab",$selectedOption,time()+3600,"/");
-                  $sql = "SELECT `file_name` FROM `files` WHERE `timestamp` = (SELECT MAX(`timestamp`) FROM `files` WHERE `category` = 'layout' AND `lab` = $selectedOption)";
-                  $ttinfo = getValue($sql);
-                  $ttinfo1 = json_encode($ttinfo);
-                  $ttinfo2 = substr($ttinfo1,14);
-                  setcookie("layout", $ttinfo2, time() + 3600, "/");
-                  $sql = "SELECT `file_name` FROM `files` WHERE `timestamp` = (SELECT MAX(`timestamp`) FROM `files` WHERE `category` = 'timetable' AND `lab` = $selectedOption)";
-                  $ttinfo = getValue($sql);
-                  $ttinfo1 = json_encode($ttinfo);               
-                  $ttinfo2 = substr($ttinfo1,14);
-                  setcookie("timetable", $ttinfo2, time() + 3600, "/");
-                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' ";
-                  $labAssistant = getValue($sql);
-                  $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' ";
-                  $labIncharge = getValue($sql);
+              if(isset($SelectedLab)){                                    
+                $selectedOption = $SelectedLab;
+                // setcookie("SelectedLab",$selectedOption,time()+3600,"/");
+                
+                $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Assistant' ";
+                $labAssistant = getValue($sql);
+                $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' ";
+                $labIncharge = getValue($sql);
 
                                 
               } else{
               $selectedOption = "Please select a lab";
               echo $selectedOption;
-            }
+              }
             
             foreach ($all_pc_info as $pc_info) {
               
@@ -236,15 +307,16 @@
               <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="staticBackdropLabel">pc INFORMATION</h1>
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">PC Information</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
-                    <?php echo "pc Number:&emsp;"   . $pc_info['pcno']; ?><br>
-                    <?php echo "pc Type:&emsp;"     . $pc_info['pcno']; ?><br>
-                    <?php echo "Patient Name:&emsp;"  . $pc_info['pcno']; ?><br>
-                    <?php echo "Doctor Name:&emsp;"   . $pc_info['mname']; ?><br>
-                    <?php echo "Lab Number:&emsp;"    . $pc_info['pcno']; ?><br>
+                    <?php echo "PC Number:&emsp;"   . $pc_info['pcno']; ?><br>
+                    <?php echo "Processor:&emsp;"     . $pc_info['processor']; ?><br>
+                    <?php echo "Memory size:&emsp;"  . $pc_info['memory']; ?><br>
+                    <?php echo "Machine Name:&emsp;"   . $pc_info['mname']; ?><br>
+                    <?php echo "Lab Number:&emsp;"    . $pc_info['labno']; ?><br>
+                    <?php echo "Softwares:&emsp;"    . $pc_info['softwares']; ?><br>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -255,6 +327,46 @@
             <?php
             }
             }
+          foreach($all_ex_info as $ex_info){
+            if($selectedOption==$ex_info['labno']){
+              ?>
+              <div class="Grid-item">
+              <div class="Item-icon<?php echo $ex_info['dsno'];?>">
+                <i class="fa-solid fa-desktop fa-2xl"></i>
+              </div>
+              <!-- Button trigger modal -->
+              <div class="Item-button">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop<?php echo $ex_info['dsno']; ?>">
+                  <?php echo $ex_info['dname'];
+                  ?>
+
+                </button>
+              </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="staticBackdrop<?php echo $ex_info['dsno']; ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Device Information</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <?php echo "Device Serial Number:&emsp;"   . $ex_info['dsno']; ?><br>
+                    <?php echo "Device Name:&emsp;"     . $ex_info['dname']; ?><br>
+                    <?php echo "Device Type:&emsp;"  . $ex_info['dtype']; ?><br>                    
+                    <?php echo "Lab Number:&emsp;"    . $ex_info['labno']; ?><br>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php
+            }
+          }
             ?>
           </div>
      </div>
@@ -266,13 +378,13 @@
               if (isset($_POST['type'])) {
                 $type = $_POST['type'];
                 if ($type == 1) {
-                  if (isset($_COOKIE["layout"])) {
-                    $ttinfo2= $_COOKIE["layout"];
+                  if (isset($_COOKIE['layout'])) {
+                    $ttinfo2=$_COOKIE['layout'];
                   $finalimage = $ttinfo2;
                   }
                 } elseif ($type == 2) {
-                  if (isset($_COOKIE["timetable"])) {
-                    $imgname2 = $_COOKIE["timetable"];
+                  if (isset($_COOKIE['timetable'])) {
+                    $imgname2 = $_COOKIE['timetable'];
                     $finalimage = $imgname2;
                   }
                 } 
@@ -289,7 +401,13 @@
             <button class="LayoutBtn" id="Limg">LAYOUT</button>
             <button class="TTBtn" id ="TTimg">TimeTable</button>
           </div>
-          <button class="EditBtn" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
+          <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge" || $_SESSION['role']=="admin"){
+
+echo <<<EOD
+        
+        <button class="EditBtn" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Edit</button>
+      EOD;
+        }?>
           <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
@@ -322,7 +440,7 @@
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="addDeivceLabel">Add New PC Information</h1>
+          <h1 class="modal-title fs-5" id="addDeivceLabel">Add New PC Information </h1> 
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -475,14 +593,31 @@
                       <textarea class="form-control" placeholder="Enter softwares in the machine" name="softwares" required rows="4"></textarea>
                     </div>
                 </div>
-                <div class="clearfix">
-            <button type="submit" class="btn btn-primary signup">Save</button>
-          </div>
+                <div class="mb-3 clearfix">
+                  <button type="submit" class="btn btn-primary signup">Save</button>
+                </div>
             </div>
             
             </form>
         </div>
         <div class="modal-footer">
+        <div class="col-md-12 head">
+        <div class="float-end">
+            <a href="javascript:void(0);" class="btn btn-success" onclick="formToggle('importFrm');"><i class="plus"></i> Import Excel</a>
+        </div>
+    </div>
+    <!-- Excel file upload form -->
+    <div class="col-md-12" id="importFrm" style="display: none;">
+        <form class="row g-3" action="import-data.php" method="post" enctype="multipart/form-data">
+            <div class="col-auto">
+                <label for="fileInput" class="visually-hidden">File</label>
+                <input type="file" class="form-control" name="file" id="fileInput" />
+            </div>
+            <div class="col-auto">
+                <input type="submit" class="btn btn-primary mb-3" name="importSubmit" value="Import">
+            </div>
+        </form>
+    </div>
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           
         </div>
@@ -501,22 +636,30 @@
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
-          <form  id="report" class="modal-content" onsubmit="submitForm2(event);this.reset();" method="post" action="labdetails.php">
-            <div class="container">
-   
-              <p>Please fill in this form to report a system.</p>
-              <hr>
+          <form  id="report" class="modal-content"  method="post" action="labdetails.php">
+            <div class="container-fluid">
               <input type="hidden" name="action" value="report">
-              <label for="pcno"><b>pc number</b></label>
-              <input type="text" placeholder="eg - 701-15" name="pcno" required><br>
 
-              <label for="issue"><b>Issue</b></label>
-              <input type="text" placeholder="" name="issue" required><br>
+              <label for="dtype"><b>Device Type</b></label>
+              <select class="form-select" id="dtype" name="dtype">
+                <option value="pc">PC</option>
+                <option value="printer">Printer</option>
+              </select>
+
+                <label for="pcno" class="col-sm-4 col-form-label"><b>Device Number</b></label>
+                <div class="mb-3 col-sm-8">
+                  <input type="text" class="form-control" placeholder="Eg - 701-15" name="pcno" required>
+                </div>
+
+                <label for="pcno" class="col-sm-4 col-form-label"><b>Issue</b></label>
+                <div class="mb-3 col-sm-8">
+                  <input type="text" class="form-control" name="issue" required>
+                </div>
 
 
 
-              <div class="clearfix">
-                <button type="submit" class="signup">submit</button>
+              <div class="mb-3 clearfix">
+                <button type="submit" class="btn btn-primary signup">Submit</button>
               </div>
             </div>
           </form>
@@ -538,19 +681,15 @@
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
           <form class="modal-content" action="labdetails.php" method="post">
-            <div class="container">
-   
-              <p>Please fill in this form to delete a system</p>
-              <hr>
+            <div class="container-fluid">
               <input type="hidden" name="action" value="delete">
-              <label for="pcno"><b>pc number</b></label>
-              <input type="text" placeholder="eg - 701-15" name="pcno" required><br>
+              <label for="pcno" class="col-sm-4 col-form-label"><b>Device Number</b></label>
+                <div class="mb-3 col-sm-8">
+                  <input type="text" class="form-control" placeholder="eg - 701-15" name="pcno" required>
+                </div>
 
-
-
-
-              <div class="clearfix">
-                <button type="submit" class="signup">submit</button>
+              <div class="mb-3 clearfix">
+                <button type="submit" class="btn btn-danger signup">Delete</button>
               </div>
             </div>
           </form>
@@ -561,90 +700,36 @@
       </div>
     </div>
   </div> 
-  <div class="modal fade" id="updateDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateDeivceLabel" aria-hidden="true">
+
+
+  <div class="modal fade" id="transferDeivce" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="transferDeivceLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="updateDeivceLabel">system information</h1>
+          <h1 class="modal-title fs-5" id="transferDeivceLabel">Transfer System</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal"></span>
           <form class="modal-content" action="labdetails.php" method="post">
-            <div class="container">
-              <h1>Update</h1>
-              <p></p>
-              <hr>
-              <input type="hidden" name="action" value="update">
-              <label for="pcno"><b>pc number</b></label>
-              <input type="text" placeholder="enter the pc number" name="pcno" required><br>
-
-              <label for="mname"><b>machine name</b></label>
-              <input type="text" placeholder="Enter machine name" name="mname" required><br>
-
-              <label for="msno"><b>machine serial number</b></label>
-              <input type="text" placeholder="enter machine serial number" name="msno" required><br>
-
-              <label for="ksno"><b>keyboard serial number</b></label>
-              <input type="text" placeholder="enter keyboard serial number" name="ksno" required><br>
-
-              <label for="muno"><b>mouse serial number</b></label>
-              <input type="text" placeholder="enter mouse serial number" name="muno" required><br>
-
-              <label for="mono"><b>monitor serial number</b></label>
-              <input type="text" placeholder="enter monitor serial number" name="mono" required><br>
-
-              <label for="ip"><b>IP address</b></label>
-              <input type="text" placeholder="enter machine ip adress" name="ip" required><br>
-
-              <label for="submsk"><b>subnet mask number</b></label>
-              <input type="text" placeholder="enter machine submsk" name="submsk" required><br>
-
-              <label for="pcname"><b>PCname</b></label>
-              <input type="text" placeholder="enter pc name" name="pcname" required><br>
-
-              <label for="processor"><b>Processor</b></label>
-              <input type="text" placeholder="enter machine processor" name="processor" required><br>
-
-              <label for="CPUspeed1"><b>CPUspeed</b></label>
-              <input type="text" placeholder="enter machine cpu speed" name="CPUspeed1" required><br>
-
-              <label for="memory"><b>memory size RAM </b></label>
-              <input type="text" placeholder="enter machine memory size" name="memory" required><br>
-
-              <label for="harddisk"><b>HARD DISK SIZE</b></label>
-              <input type="text" placeholder="enter hard disk SIZE" name="harddisk" required><br>
+            <div class="container-fluid">
               
-              <label for="cpuspeed"><b>CPU SPEED</b></label>
-              <input type="text" placeholder="enter DVD ROM TYPE" name="cpuspeed" required><br>
+              <input type="hidden" name="action" value="transfer">
+            <label for="pcno" class="col-sm-4 col-form-label"><b>PC Number</b></label>
+                <div class="mb-3 col-sm-8">
+                  <input type="text" class="form-control" placeholder="eg - 701-15" name="pcno" required>
+                </div>
 
-              <label for="dvd"><b>DVD TYPE</b></label>
-              <input type="text" placeholder="enter DVD ROM TYPE" name="dvd" required><br>
+                <label for="newlab" class="col-sm-4 col-form-label"><b>Change Lab to</b></label>
+                <div class="mb-3 col-sm-8">
+                  <input type="text" class="form-control" placeholder="eg - 701" name="newlab" required>
+                </div>
 
-              <label for="display"><b>display specs</b></label>
-              <input type="text" placeholder="enter display specs" name="display" required><br>
-
-              <label for="sound"><b>sound specs</b></label>
-              <input type="text" placeholder="enter sound specs" name="sound" required><br>
-
-              <label for="lancard"><b>lancard type</b></label>
-              <input type="text" placeholder="enter lan card type" name="lancard" required><br>
-
-              <label for="monitor"><b>monitor model</b></label>
-              <input type="text" placeholder="enter monitor model" name="monitor" required><br>
-
-              <label for="keyboard"><b>keyboard model</b></label>
-              <input type="text" placeholder="enter keyboard model" name="keyboard" required><br>
-
-              <label for="mouse"><b>mouse model</b></label>
-              <input type="text" placeholder="enter mouse model" name="mouse" required><br>
-
-              <label for="softwares"><b>softwares in the pc</b></label>
-              <input type="text" placeholder="enter softwares in the machine" name="softwares" required><br>
+              
 
 
-              <div class="clearfix">
-                <button type="submit" class="signup">sumbit</button>
+              <div class="clearfix  mb-3">
+                <button type="submit" class="signup btn btn-primary">Transfer</button>
               </div>
             </div>
           </form>
@@ -660,9 +745,9 @@
                       <?php 
                         if (isset($labAssistant) && isset($labIncharge)) {
                       ?>
-                        LAB INCHARGE : <?php echo $labIncharge['fname'];?> &nbsp; <?php echo $labIncharge['lname'];  ?>
+                        <b>Lab Incharge :</b> <?php echo $labIncharge['fname'];?>  <?php echo $labIncharge['lname'];  ?>
                         &emsp;&emsp;&emsp;&emsp;
-                        LAB ASSISTANT : <?php echo $labAssistant['fname'];?> &nbsp; <?php echo $labAssistant['lname'];  ?>
+                        <b>Lab Assistant :</b> <?php echo $labAssistant['fname'];?> <?php echo $labAssistant['lname'];  ?>
                     
                       <?php
                         }
@@ -670,10 +755,7 @@
                         }
                       ?>
                   </div>
-              </div>
-                  <div>
-                     Made with &#10083;
-                  </div>
+
             </div>             
           
 
