@@ -148,7 +148,7 @@
             <div class="NavItem">
                 <a href="landing_page.php">HOME</a>
                 <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
-        <a href="logout.php"><button class="btn btn-primary" >logout</button></a>
+        <a href="logout.php"><button class="btn btn-primary" >Logout</button></a>
             </div>
         </div>
     </nav>

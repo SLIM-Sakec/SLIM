@@ -80,7 +80,7 @@
       <div class="NavItem">
         <a href="landing_page.php">HOME</a>
         <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
-        <a href="logout.php"><button class="btn btn-primary">logout</button></a>
+        <a href="logout.php"><button class="btn btn-primary">Logout</button></a>
       </div>
     </div>
   </nav>
@@ -106,15 +106,14 @@
               <form action="uploadmanual.php" method="post" enctype="multipart/form-data" target="blank">
                 <input type="file" name="file" />
                 <div>
-                  <span>year: </span><select name="year">
+                  <span>Year: </span><select name="year">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                   </select>
-                </div>
-                <div>
-                  <span>semester: </span><select name="semester">
+                
+                  <span style="margin-left: 20px;">Semester: </span><select name="semester">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -129,7 +128,7 @@
                   <span>Subject Code : </span><input type="text" name="subjectcode" id="subjectcode"
                     placeholder="eg: CSC301">
                 </div>
-                <button type="submit" name="uploadmanual" id="submit" onclick="submitForm()">Submit</button>
+                <button style="margin-left: 5px;" class="btn btn-primary" type="submit" name="uploadmanual" id="submit" onclick="submitForm()">Submit</button>
               </form>
             </div>
             <div class="modal-footer">

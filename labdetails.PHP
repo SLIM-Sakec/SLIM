@@ -229,14 +229,16 @@ function formToggle(ID){
   <nav>
     <div class="NavContainer">
       <div class="logo">
-        <h1>
-          SLIM
-        </h1>
+        <a href="landing_page.php" style="text-decoration:none;"> 
+          <h1>
+            SLIM
+          </h1> 
+        </a>
       </div>
       <div class="NavItem">
-        <a href="landing_page.php">HOME</a>
+        <!-- <a href="landing_page.php">Home</a> -->
         <a href="login_page.php" data-bs-toggle="collapse" data-bs-target="#collapseWidthExample" aria-expanded="false" aria-controls="collapseWidthExample" ><?php echo $_SESSION['email'];?> </a>  
-        <a href="logout.php"><button class="btn btn-primary">logout</button></a>
+        <a href="logout.php"><button class="btn btn-primary">Logout</button></a>
         
           <!-- <div class="collapse collapse-horizontal" id="collapseWidthExample" style="position:absolute; align-items: right;" >
             <div class="card card-body" style=" float:right; width: 100px; ">
@@ -450,13 +452,13 @@ echo <<<EOD
                   <div class="modal-body">
                     <form action="upload.php" method="post" enctype="multipart/form-data" target="blank">
                       <input type="file" name="file" />
-                      <select name="category">
+                      <select name="category" >
                           <option value="timetable">TimeTable</option>
                           <option value="layout">Layout</option>
                           
                       </select>
-                      <button type="submit" name="upload" id="submit" onclick="submitForm(event)">Submit</button>
-                      <button type="reset">reset</button>
+                      <button type="submit" name="upload" id="submit" onclick="submitForm(event)" class="btn btn-primary" style="margin: 5px; margin-top: 15px;">Submit</button>
+                      <button type="reset" class="btn btn-danger" style="margin: 5px; margin-top: 15px;">Reset</button>
                     </form>
                   </div>
                   <div class="modal-footer">
