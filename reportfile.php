@@ -26,7 +26,7 @@ $sql= "SELECT DISTINCT labno FROM devices ORDER BY labno ASC";
 $labs=getAllValues($sql); 
 $sql= "SELECT * FROM slim_labdetails ORDER BY labno ASC";
 $labdetails=getAllValues($sql); 
-$sql= "SELECT SUM(cost) as tcost FROM slim_labdetails";
+$sql= "SELECT FORMAT(SUM(cost),'0,000') as tcost FROM slim_labdetails";
 $tcost=getValue($sql);
 ?>
 
@@ -127,7 +127,7 @@ $tcost=getValue($sql);
                                     $epccount = getValue($sql);
                                     $sql = "SELECT area FROM slim_labdetails WHERE labno=" . $lab['labno'];
                                     $labarea =getValue($sql);
-                                    $sql = "SELECT cost FROM slim_labdetails WHERE labno=" . $lab['labno'];
+                                    $sql = "SELECT FORMAT(cost,'0,000') as cost FROM slim_labdetails WHERE labno=" . $lab['labno'];
                                     $labcost =getValue($sql);
 
                                 

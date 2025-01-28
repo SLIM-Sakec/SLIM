@@ -97,6 +97,8 @@
          {
         $sql="UPDATE `slim_users` SET `role`='Lab Assistant',`labno`=$labno  WHERE `uid`=$labAssistantnew";
         $result = mysqli_query($conn, $sql);
+        
+        
             if($olduidla2>=1)
                 {
                 $sql1="UPDATE `slim_users` SET `role`='Professor' WHERE `uid`=$olduidla2";
@@ -113,6 +115,7 @@
             $result = mysqli_query($conn, $sql1);
          }  
         }
+        
       }
       else if($_POST['action'] == "addLabModal"){
         $labNo = $_POST['labno'];
@@ -163,6 +166,7 @@
             </div>
         </div>
         <div class="options">
+            <a href="logs.php" style="text-decoration: none;font-size:20px;">Change Logs</a>
             <a href="repair_log.php" style="text-decoration: none;font-size:20px;">Repair Log</a>
             <a href="reportfile.php" style="text-decoration: none;font-size:20px;">Report Generator</a>
         </div>

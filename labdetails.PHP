@@ -102,6 +102,11 @@ function formToggle(ID){
           "INSERT INTO `devices`(`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
           VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0')";
         $result = mysqli_query($conn, $sql1);
+        $currentDateTimeNumeric = date("YmdHis");
+        $currentuser = $_SESSION['email'];
+        $logsql = "INSERT INTO `logs`(`changes`, `email`, `date`) 
+          VALUES ('New Device - $pcno added in lab $labno','$currentuser','$currentDateTimeNumeric')";
+        $result = mysqli_query($conn, $logsql);
         }
         else {
           echo '<script>alert("No access for this lab")</script>';
@@ -118,6 +123,11 @@ function formToggle(ID){
           $sql2 = "UPDATE `devices` SET `isworking` = 0 WHERE `pcno`= '$pcno'";
           $result = mysqli_query($conn, $sql1);
           $result = mysqli_query($conn, $sql2);
+          $currentDateTimeNumeric = date("YmdHis");
+          $currentuser = $_SESSION['email'];
+          $logsql = "INSERT INTO `logs`(`changes`, `email`, `date`) 
+            VALUES ('Device - $pcno Reported malfunction in lab $labno - entry  added in Repair Log','$currentuser','$currentDateTimeNumeric')";
+          $result = mysqli_query($conn, $logsql);
           echo "<meta http-equiv='refresh' content='0'>";
           }
           else if($dtype=='printer'){
@@ -140,6 +150,12 @@ function formToggle(ID){
           $sql1 = "DELETE FROM `devices` WHERE `pcno`='$pcno'";
 
           $result = mysqli_query($conn, $sql1);
+
+          $currentDateTimeNumeric = date("YmdHis");
+          $currentuser = $_SESSION['email'];
+          $logsql = "INSERT INTO `logs`(`changes`, `email`, `date`) 
+            VALUES ('Device - $pcno removed from lab $labno','$currentuser','$currentDateTimeNumeric')";
+          $result = mysqli_query($conn, $logsql);
         }
         else {
           echo '<script>alert("No access for this lab")</script>';
@@ -174,6 +190,13 @@ function formToggle(ID){
             "UPDATE `devices` SET (`sno`, `pcno`, `mname`, `msno`, `ksno`, `muno`, `mono`, `ip`, `submsk`, `pcname`, `processor`, `CPUspeed`, `memory`, `harddisk`, `dvd`, `display`, `sound`, `lancard`, `monitor`, `keyboard`, `mouse`, `softwares`, `dept`, `labno`, `isworking`, `istransfered`, `isscrapped`) 
             VALUES ('','$pcno','$mname','$msno','$ksno','$muno','$mono','$ip','$submsk','$pcname','$processor','$cpuspeed','$memory','$harddisk','$dvd','$display','$sound','$lancard','$monitor','$keyboard','$mouse','$softwares','$dept','$labno','1','0','0') WHERE 'pcno'=$pcno";
           $result = mysqli_query($conn, $sql1);
+
+          $currentDateTimeNumeric = date("YmdHis");
+          $currentuser = $_SESSION['email'];
+          $logsql = "INSERT INTO `logs`(`changes`, `email`, `date`) 
+            VALUES ('Details updated Device - $pcno in lab $labno','$currentuser','$currentDateTimeNumeric')";
+          $result = mysqli_query($conn, $logsql);
+           
         }
         else {
           echo '<script>alert("No access for this lab")</script>';
@@ -187,6 +210,12 @@ function formToggle(ID){
         if($_SESSION['role']=='admin'){
           $sql= "UPDATE `devices` SET `labno` = '$newlab' WHERE `pcno`='$pcno'";
           $result = mysqli_query($conn, $sql);
+
+          $currentDateTimeNumeric = date("YmdHis");
+          $currentuser = $_SESSION['email'];
+          $logsql = "INSERT INTO `logs`(`changes`, `email`, `date`) 
+            VALUES ('Details updated Device - $pcno in lab $labno','$currentuser','$currentDateTimeNumeric')";
+          $result = mysqli_query($conn, $logsql);
         }
         else {
           echo '<script>alert("No access for this lab")</script>';
@@ -247,7 +276,7 @@ function formToggle(ID){
   </div>
   <div class="Hero">
     <div class="SideNav">
-      <ul style="margin-top: 50px; padding:20px;">
+      <ul style="margin-left: 10px; padding:20px;">
         <li><a href="manual.php" style="text-decoration: none;font-size:20px;">Subject Manual</a></li>
           <?php if($_SESSION['role']=="Lab Assistant" || $_SESSION['role']=="Lab Incharge" || $_SESSION['role']=="admin"){
 
@@ -264,6 +293,7 @@ function formToggle(ID){
           }
           ?>
       </ul>
+
     </div>
     <div id="gridChanger">
         <div class="Grid-container">
@@ -276,8 +306,10 @@ function formToggle(ID){
                 $labAssistant = getValue($sql);
                 $sql ="SELECT `fname`, `lname` FROM `slim_users` WHERE `labno` =$selectedOption AND `role`= 'Lab Incharge' ";
                 $labIncharge = getValue($sql);
-
-                                
+                $sql ="SELECT `area` FROM `slim_labdetails` WHERE `labno` =$selectedOption";
+                $labarea = getValue($sql);
+                $sql ="SELECT `cost` FROM `slim_labdetails` WHERE `labno` =$selectedOption";
+                $labcost = getValue($sql);               
               } else{
               $selectedOption = "Please select a lab";
               echo $selectedOption;
@@ -332,7 +364,7 @@ function formToggle(ID){
               ?>
               <div class="Grid-item">
               <div class="Item-icon<?php echo $ex_info['dsno'];?>">
-                <i class="fa-solid fa-desktop fa-2xl"></i>
+                <i class="fa-solid fa-print fa-2xl"></i>
               </div>
               <!-- Button trigger modal -->
               <div class="Item-button">
@@ -748,7 +780,10 @@ echo <<<EOD
                         <b>Lab Incharge :</b> <?php echo $labIncharge['fname'];?>  <?php echo $labIncharge['lname'];  ?>
                         &emsp;&emsp;&emsp;&emsp;
                         <b>Lab Assistant :</b> <?php echo $labAssistant['fname'];?> <?php echo $labAssistant['lname'];  ?>
-                    
+                        &emsp;&emsp;&emsp;&emsp;
+                        <b>Lab Area :</b> <?php echo $labarea['area'] . " Sq.m";?> 
+                        &emsp;&emsp;&emsp;&emsp;
+                        <b>Lab Cost :</b> <?php echo "Rs. ". $labcost['cost'] ;?> 
                       <?php
                         }
                         else{  
@@ -768,7 +803,7 @@ echo <<<EOD
     // Sample JSON data for countries and cities
     const college = {
       countries: [{
-          name: "Comps",
+          name: "Computer Engineering",
           cities: [<?php 
              $sql = "SELECT DISTINCT`labno` FROM `devices` WHERE `pcno` = 'lablist' ";
              $labinfo= getAllValues($sql);
@@ -778,11 +813,11 @@ echo <<<EOD
                  } ?>]
         },
         {
-          name: "IT",
+          name: "Information Technology",
           cities: ["4", "5", "6"]
         },
         {
-          name: "EXTC",
+          name: "Electronic And Telecommunication",
           cities: ["7", "8", "9"]
         }
         
